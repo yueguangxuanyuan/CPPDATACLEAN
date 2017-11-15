@@ -4,13 +4,14 @@ package cn.nju.edu.software;
  * Created by zr on 2017/11/14.
  */
 public class ConstantConfig {
-    public static String MYSQLURL = "jdbc:mysql://localhost:3306/";
-    public static String MYSQLBASE = "cpp_test_server";
+    public static String MYSQLURL = "jdbc:mysql://localhost:3306/";//本地mysql的路径
+    public static String MYSQLBASE = "cpp_test_server";//server的数据库
     public static String MYSQLUSERNAME = "root";
     public static String MYSQLPASSWORD = "";
-    public static String CLEANBASE = "clean_base";
-    public static String LOGPATH = "";
-    public static String MONITORPATH = "";
-    public static String LOGUNZIPPATH = "";
-    public static String MONITORUNZIPPATH = "";
+    public static String CLEANBASE = "clean_base";//清洗完的数据存的数据库
+    public static String LOGPATH = "";//log文件存放的路径
+    public static String MONITORPATH = "";//monitor文件存放的路径
+    public static String LOGUNZIPPATH = "";//log文件解压路径
+    public static String MONITORUNZIPPATH = "";//monitor文件解压路径
+    public static String TEMPBASE = "temp_logdb";//临时的本地表，和logdb文件里的表结构完全一样
 }
