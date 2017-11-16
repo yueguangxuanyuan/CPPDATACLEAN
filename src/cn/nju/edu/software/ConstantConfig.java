@@ -7,7 +7,7 @@ public class ConstantConfig {
     public static String MYSQLURL = "jdbc:mysql://localhost:3306/";//本地mysql的路径
     public static String MYSQLBASE = "cpp_test_server";//server的数据库
     public static String MYSQLUSERNAME = "root";
-    public static String MYSQLPASSWORD = "";
+    public static String MYSQLPASSWORD = "root";
     public static String CLEANBASE = "clean_base";//清洗完的数据存的数据库
     public static String LOGPATH = "";//log文件存放的路径
     public static String MONITORPATH = "";//monitor文件存放的路径
