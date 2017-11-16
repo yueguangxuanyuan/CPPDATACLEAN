@@ -49,6 +49,7 @@ public class CleanJob {
 
             //monitor数据logdb的去重
             if(c.getUser_id()!=current_id){
+                //从本地临时数据库进行数据分析，结果插入最终的数据库，七个模块
                 //清空数据库
                 dataUtil.cleanTempDatabase();
             }
