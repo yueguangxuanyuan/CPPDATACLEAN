@@ -10,10 +10,9 @@ import java.sql.*;
  * Created by zr on 2017/11/14.
  */
 public class DaoUtil {
-    public void createDatabase(){
-        String sql = "";//建库语句
-        Statement s = null;
-        Connection c = getMySqlConnection(ConstantConfig.CLEANBASE);
+
+    public static void executeSql(Connection c,String sql){
+     Statement s = null;
         if(c!=null){
             try {
                 s = c.createStatement();
@@ -26,6 +25,30 @@ public class DaoUtil {
 
         }
     }
+    /*
+    * 建最后的存储表，直接执行sql
+    * */
+    public void createTable(){
+        String sql = "";//建库语句
+        Statement s = null;
+        Connection c = getMySqlConnection(ConstantConfig.CLEANBASE);
+        executeSql(c,sql);
+    }
+
+    /*
+    建临时表，直接执行sql
+     */
+    public void createTempDatabase(){
+        String sql = "create DATABASE if not EXISTS temp_logdb";
+        Statement s = null;
+        Connection c = getMySqlConnection(ConstantConfig.CLEANBASE);
+        executeSql(c,sql);
+
+        c =getMySqlConnection(ConstantConfig.TEMPBASE);
+        String tableSql ="";
+        executeSql(c,tableSql);
+    }
+
 
     public static Connection getSqliteConnection(String dbPath){
         Connection c = null;
