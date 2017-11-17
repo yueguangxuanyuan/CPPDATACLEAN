@@ -149,7 +149,7 @@ public class BuildInfoCleanUtil {
     //插入每一条编译结果的详情。
     static void insertBuildInfoDetail(List<BuildInfoDetail> list){
             Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
-            ResultSet set=null;
+           // ResultSet set=null;
             try {
                 PreparedStatement pstm=connection.prepareStatement("insert into " +
                         "build_info(result_type,build_id,detail,result_info) values(?,?,?,?)");
@@ -214,6 +214,7 @@ public class BuildInfoCleanUtil {
                res=set.getInt("maxId");
                break;
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
