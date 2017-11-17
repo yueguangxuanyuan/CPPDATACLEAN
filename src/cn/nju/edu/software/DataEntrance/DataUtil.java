@@ -3,8 +3,10 @@ package cn.nju.edu.software.DataEntrance;
 import cn.nju.edu.software.ConstantConfig;
 import cn.nju.edu.software.Model.CommitModel;
 import cn.nju.edu.software.SqlHelp.DaoUtil;
+import com.google.gson.*;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ public class DataUtil {
         }
         return null;
     }
+
     private boolean isExistsTemp(String tableName,int id){
         Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         if(c!=null){
@@ -77,13 +80,98 @@ public class DataUtil {
         }
         return true;
     }
-    public void getDataFromServerLog(String logFile){
+
+    public void insertDataFromServerLog(String logFile, int e_id, int s_id){
         try {
             FileReader fr = new FileReader(logFile);
             BufferedReader br = new BufferedReader(fr);
             String line = null;
             while ((line=br.readLine())!=null){
                 //解析每一行
+                String[] temp = line.split("::");
+                String actionType = temp[2];
+                if(actionType.equals("test")){
+                    String time = temp[0];
+                    int exam_id = Integer.valueOf(temp[4]);
+                    int question_id = Integer.valueOf(temp[6]);
+                    String test_result = temp[8];//解析json字符串？
+                    //插入数据库的测试表
+                    JsonObject j =  new JsonParser().parse(test_result).getAsJsonObject();
+                    int ac_count = 0;
+                    int total_count = 0;
+                    String accept_case = "";
+                    String wrong_answer = "";
+                    if(j.has("WA")) {
+                        JsonArray wa_case = j.get("WA").getAsJsonArray();
+                        total_count +=wa_case.size();
+                        for(int i=0;i<wa_case.size();i++){
+                            wrong_answer+=wa_case.get(i).toString();
+                        }
+                    }
+                    if(j.has("AC")) {
+                        JsonArray ac_case = j.get("AC").getAsJsonArray();
+                        ac_count = ac_case.size();
+                        for(int i=0;i<ac_count;i++){
+                            accept_case+=ac_case.get(i).toString()+";";
+                        }
+                    }
+                    if(j.has("TIE")) {
+                        JsonArray tie_case = j.get("TIE").getAsJsonArray();
+                        total_count+=tie_case.size();
+                        for(int i=0;i<tie_case.size();i++){
+                            wrong_answer+=tie_case.get(i).toString();
+                        }
+                    }
+                    if(j.has("RE")) {
+                        JsonArray re_case = j.get("RE").getAsJsonArray();
+                        total_count+=re_case.size();
+                        for(int i=0;i<re_case.size();i++){
+                            wrong_answer+=re_case.get(i).toString();
+                        }
+                    }
+                    double tscore = (double)ac_count/(double)total_count;
+                    BigDecimal temps = new BigDecimal(tscore);
+                    double score =temps.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    score = score*100;
+
+                    System.out.println("std:"+s_id+" ac:"+accept_case+" wa:"+wrong_answer+" score:"+score);
+
+                    boolean isExist = false;
+                    Connection c = DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
+                    if(c!=null){
+                        //确保日志不重复
+                        try{
+                            String sql = "select count(*) from test where test_time = '"+time+"';";
+                            Statement s = c.createStatement();
+                            ResultSet rs = s.executeQuery(sql);
+                            if(rs.getInt(1)==1){
+                                isExist = true;
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                        if (!isExist) {
+                            try {
+                                String sql = "insert into test(eid,sid,pid,score,accept_case,wrong_answer,test_time) values (?,?,?,?,?,?,?)";
+                                PreparedStatement s = c.prepareStatement(sql);
+                                s.setInt(1, e_id);
+                                s.setInt(2, s_id);
+                                s.setInt(3, question_id);
+                                s.setDouble(4, score);//score
+                                s.setString(5, accept_case);//accept_case
+                                s.setString(6, wrong_answer);//wrong_case
+                                s.setString(7, time);//time
+                                s.executeUpdate();
+                                s.close();
+                                c.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -181,4 +269,6 @@ public class DataUtil {
         }
 
     }
+
+
 }
