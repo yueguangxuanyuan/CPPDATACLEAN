@@ -35,10 +35,11 @@ create table build(
 	eid int (10) not null COMMENT '考试id',
 	sid int(10) not null COMMENT '学生的id',
 	pid int (10) not null COMMENT '题目id',
-	warning_num int(10) default '0' COMMENT '警告信息出现的次数',
-	error_num int(10) default '0' COMMENT '警告错误出现的次数',
-	success_num int(10) default '0' COMMENT '编译成功的次数',
-	failed_num int(10) default '0' COMMENT '编译失败的次数',
+	pname int (10) not null COMMENT '项目的名称',
+	result varchar(255) COMMENT 'build的结果，值为SUCCESS,FAILED',
+	content text COMMENT '编译提示的结果',
+	`begintime` datetime,
+	`endtime` datetime,
 	PRIMARY Key(id)
 );
 
@@ -47,12 +48,10 @@ create table build_info(
 	id int(10) not null AUTO_INCREMENT COMMENT 'id主键',
 	result_type varchar(255) COMMENT '类型为ERROR,WARNING两种，成功的不记录',
 	build_id int(10) not null,
-	content text,
+	detail text COMMENT '编译结果的详情，成功的不记录',
 	result_info varchar(255) COMMENT '编译的报错类型，如未定义的标识符',
-	`begintime` datetime, 
-	`endtime` datetime,
 	PRIMARY KEY(id)
-);
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='build的详情表，记录Build的结果';
 
 
 drop table if EXISTS debug;

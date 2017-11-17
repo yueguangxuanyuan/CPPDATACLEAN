@@ -1,13 +1,11 @@
 package cn.nju.edu.software.Model.sqlitemodel;
 
-import java.sql.Timestamp;
-
 /**
  * Created by zuce wei on 2017/11/16.
  */
 public class CommandTextModel {
     private int id;
-    private Timestamp time;
+    private String time;
     private String action;
     private String name;
     private String filePath;
@@ -23,11 +21,11 @@ public class CommandTextModel {
         this.id = id;
     }
 
-    public Timestamp getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

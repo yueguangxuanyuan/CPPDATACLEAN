@@ -15,12 +15,29 @@ import java.util.List;
 /**
  * Created by zuce wei on 2017/11/16.
  */
-public class TextInfoUtil {
+public class TextInfoCleanUtil {
     public static void main(String args[]) {
         readRawCommandTextData();
     }
-    public static void cleanTextInfo(){
 
+
+    public void cleanTextInfo(int sid,int eid){
+        List<CommandTextModel> commandTextModels=readRawCommandTextData();
+        List<TextInfoModel> textInfoModels=new ArrayList<>();
+        for(CommandTextModel commandTextModel:commandTextModels){
+                TextInfoModel textInfoModel=new TextInfoModel();
+                textInfoModel.setEid(eid);
+                textInfoModel.setSid(sid);
+                textInfoModel.setProjectName(commandTextModel.getProjectName());
+                textInfoModel.setContent(commandTextModel.getContent());
+                textInfoModel.setFileName(commandTextModel.getName());
+                textInfoModel.setTime(commandTextModel.getTime());
+                textInfoModel.setFilePath(commandTextModel.getFilePath());
+                textInfoModel.setType(commandTextModel.getAction());
+                textInfoModels.add(textInfoModel);
+        }
+
+        insertTextInfo(textInfoModels);
     }
 
     //读取原始的数据库的数据
@@ -65,8 +82,8 @@ public class TextInfoUtil {
                 pstm.setInt(3,model.getPid());
                 pstm.setString(5,model.getProjectName());
                 pstm.setString(6,model.getType());
-                pstm.setString(7,model.getConetnt());
-                pstm.setDate(8,model.getTime());
+                pstm.setString(7,model.getContent());
+                pstm.setString(8,model.getTime());
                 pstm.setString(9,model.getFileName());
                 pstm.setString(10,model.getFilePath());
                 pstm.addBatch();//准备批量插入

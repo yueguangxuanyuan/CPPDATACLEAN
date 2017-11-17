@@ -1,15 +1,13 @@
 package cn.nju.edu.software.Model.sqlitemodel;
 
-import java.sql.Date;
-
 /**
  * Created by zuce wei on 2017/11/16.
  */
-public class BuildInfo {
+public class BuildRawInfoModel {
     private int id;
-    private Date time;
-    private Date startTime;
-    private Date endTime;
+    private String time;
+    private String startTime;
+    private String endTime;
     private String solutionName;
     private String content;
 
@@ -21,27 +19,27 @@ public class BuildInfo {
         this.id = id;
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
-    public Date getStartTime() {
+    public java.lang.String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(java.lang.String startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public java.lang.String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(java.lang.String endTime) {
         this.endTime = endTime;
     }
 

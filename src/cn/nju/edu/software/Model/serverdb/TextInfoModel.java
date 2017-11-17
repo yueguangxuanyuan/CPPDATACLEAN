@@ -1,14 +1,12 @@
 package cn.nju.edu.software.Model.serverdb;
 
-import java.sql.Date;
-
 /**
  * Created by zuce wei on 2017/11/16.
  */
 public class TextInfoModel extends BaseModel{
     private String type;//文本的操作类型，只能为COPY、CUT、PASTE
-    private String conetnt;//文本操作的内容
-    private Date time;              //操作的时间
+    private String content;//文本操作的内容
+    private String time;              //操作的时间
     private String fileName;
     private String filePath;
 
@@ -20,19 +18,19 @@ public class TextInfoModel extends BaseModel{
         this.type = type;
     }
 
-    public String getConetnt() {
-        return conetnt;
+    public String getContent() {
+        return content;
     }
 
-    public void setConetnt(String conetnt) {
-        this.conetnt = conetnt;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
