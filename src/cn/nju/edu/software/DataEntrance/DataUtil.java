@@ -34,7 +34,7 @@ public class DataUtil {
         return null;
     }
     private boolean isExistsTemp(String tableName,int id){
-        Connection c = DaoUtil.getSqliteConnection(ConstantConfig.TEMPBASE);
+        Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         if(c!=null){
             try {
                 Statement s = c.createStatement();
@@ -48,6 +48,32 @@ public class DataUtil {
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }
+        return true;
+    }
+
+    private boolean isExistsTemp(String tableName,ResultSet rs){
+        try {
+            ResultSetMetaData rsm = rs.getMetaData();
+            int count = rsm.getColumnCount();
+            Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+            if(c!=null){
+                Statement s = c.createStatement();
+                String sql = "";
+                for(int i=1;i<count;i++){
+                    sql += rsm.getColumnName(i)+"='"+rs.getObject(i).toString()+"'and";
+                }
+                sql+= rsm.getColumnName(count)+"='"+rs.getObject(count).toString()+"';";
+                String exesql = "select count(*) from "+tableName+" where "+sql;
+                int isEx = s.executeQuery(exesql).getInt(1);
+                if(isEx==1){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return true;
     }
@@ -125,24 +151,27 @@ public class DataUtil {
                     //放进mysql
                     if(!isExists){
                         //插入数据
-                        String col = "(";
-                        String value = "(";
-                        for(int i = 1;i<=columnCount;i++){
-                            String colName = rsm.getColumnLabel(i);
-                            col += colName+",";
-                            value += "?,";
+                        boolean isEx = isExistsTemp(tableName,rs);
+                        if(!isEx) {
+                            String col = "(";
+                            String value = "(";
+                            for (int i = 1; i <= columnCount; i++) {
+                                String colName = rsm.getColumnLabel(i);
+                                col += colName + ",";
+                                value += "?,";
+                            }
+                            col = col.substring(0, col.length() - 1);
+                            col = col + ")";
+                            value = value.substring(0, value.length() - 1);
+                            value = value + ");";
+                            String sql = "insert into " + tableName + col + " values" + value;
+                            PreparedStatement ps = c.prepareStatement(sql);
+                            for (int i = 1; i <= columnCount; i++) {
+                                ps.setString(i, rs.getObject(i).toString());
+                            }
+                            ps.executeUpdate();
+                            ps.close();
                         }
-                        col = col.substring(0,col.length()-1);
-                        col = col+")";
-                        value = value.substring(0,value.length()-1);
-                        value = value +");";
-                        String sql = "insert into "+tableName+col+" values"+value;
-                        PreparedStatement ps = c.prepareStatement(sql);
-                        for(int i = 1;i<=columnCount;i++){
-                            ps.setString(i,rs.getObject(i).toString());
-                        }
-                        ps.executeUpdate();
-                        ps.close();
                     }
                 }
             rs.close();
