@@ -135,6 +135,7 @@ public class BuildInfoCleanUtil {
                 model.setContent(set.getString("content"));
                 list.add(model);
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

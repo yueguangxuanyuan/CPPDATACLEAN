@@ -63,6 +63,7 @@ public class TextInfoCleanUtil {
                 model.setTime(set.getString("time"));
                 list.add(model);
             }
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
