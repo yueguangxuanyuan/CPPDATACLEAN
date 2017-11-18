@@ -25,6 +25,20 @@ public class DaoUtil {
 
         }
     }
+    public static void executeUpdate(Connection c,String sql){
+        Statement s = null;
+        if(c!=null){
+            try {
+                s = c.createStatement();
+                s.executeUpdate(sql);
+                s.close();
+                c.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
     /*
     * 建最后的存储表，直接执行sql
     * */

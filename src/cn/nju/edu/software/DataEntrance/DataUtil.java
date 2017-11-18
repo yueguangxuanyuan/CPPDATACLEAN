@@ -15,6 +15,20 @@ import java.util.List;
  * Created by zr on 2017/11/14.
  */
 public class DataUtil {
+    Connection tempbaseCon = null;
+    Connection mysqlbaseCon = null;
+    public void ConnectToDatabase(){
+        tempbaseCon = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        mysqlbaseCon = DaoUtil.getMySqlConnection(ConstantConfig.MYSQLBASE);
+    }
+    public void closeCon(){
+        try {
+            tempbaseCon.close();
+            mysqlbaseCon.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     public ResultSet getDataFromLogDB(String dbPath,String tableName){
         Connection c = DaoUtil.getSqliteConnection(dbPath);
 
@@ -70,14 +84,14 @@ public class DataUtil {
     }
 
     private boolean isExistsTemp(String tableName,ResultSet rs){
-        Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        //Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         try {
             //System.out.println(rs.getObject(6).toString());
             ResultSetMetaData rsm = rs.getMetaData();
             int count = rsm.getColumnCount();
             //System.out.println(count);
 
-            if(c!=null){
+            if(tempbaseCon!=null){
                 //Statement s = c.createStatement();
                 String sql = "";
                 for(int i=2;i<count;i++){
@@ -90,7 +104,7 @@ public class DataUtil {
                 sql+= rsm.getColumnName(count)+"= ?;";
                 String exesql = "select count(*) from "+tableName+" where "+sql;
                 //System.out.println(exesql);
-                PreparedStatement s = c.prepareStatement(exesql);
+                PreparedStatement s = tempbaseCon.prepareStatement(exesql);
                 for(int i=2;i<=count;i++){
 
                     s.setObject(i-1,rs.getObject(i));
@@ -102,25 +116,21 @@ public class DataUtil {
                 if(isEx>0){
                     trs.close();
                     s.close();
-                    c.close();
+                    //c.close();
                     return true;
                 }else{
                     trs.close();
                     s.close();
-                    c.close();
+                    //c.close();
                     return false;
                 }
             }
 
-            c.close();
+            //c.close();
         }catch (Exception e){
             e.printStackTrace();
         }
-        try{
-            c.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
         return true;
     }
 
@@ -269,12 +279,12 @@ public class DataUtil {
                 "TRUNCATE TABLE solution_open_event;\n" +
                 "TRUNCATE TABLE file_event;";
         Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
-        DaoUtil.executeSql(c,sql);
+        DaoUtil.executeUpdate(c,sql);
     }
 
     public void insertToTempDatabase(String logdbPath,String tableName){
-        System.out.println("insert into "+tableName +" from "+logdbPath);
-        Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        //System.out.println("insert into "+tableName +" from "+logdbPath);
+        //Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         Connection sqlitec  = DaoUtil.getSqliteConnection(logdbPath);
         List<String> columnList = new ArrayList<>();
         try{
@@ -282,7 +292,7 @@ public class DataUtil {
 //            int columnCount = rsm.getColumnCount();
             //获取列的名字
             String columnSql = "show columns from "+tableName+";";
-            Statement columnS = c.createStatement();
+            Statement columnS = tempbaseCon.createStatement();
             ResultSet columnRs = columnS.executeQuery(columnSql);
             int columnCount = 0;
             while (columnRs.next()){
@@ -311,7 +321,7 @@ public class DataUtil {
             value = value.substring(0, value.length() - 1);
             value = value + ");";
             String sql = "insert into " + tableName + col + " values" + value;
-            PreparedStatement ps = c.prepareStatement(sql);
+            PreparedStatement ps = tempbaseCon.prepareStatement(sql);
 
                 while (rs.next()) {
                     //读取数据
@@ -328,7 +338,7 @@ public class DataUtil {
                             ps.addBatch();
 
                     }else{
-                        System.out.println("已经存在");
+                        //System.out.println("已经存在");
                     }
                 }
             ps.executeBatch();
@@ -338,18 +348,13 @@ public class DataUtil {
             columnRs.close();
             columnS.close();
             rs.close();
-            c.close();
+            //c.close();
             //System.out.println(tableName + "close");
         }catch (Exception e){
 
             e.printStackTrace();
         }
-        try{
-            c.close();
-            sqlitec.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
 
     }
 
