@@ -47,8 +47,9 @@ public class TextInfoCleanUtil {
         List<CommandTextModel> list=new ArrayList<>();
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         ResultSet set=null;
+        PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement("select * from command_text where action!='SAVE'");
+             prepar=connection.prepareStatement("select * from command_text where action!='SAVE'");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
@@ -65,8 +66,9 @@ public class TextInfoCleanUtil {
             }
             connection.close();
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,set);
         }
 
         return list;
@@ -75,8 +77,9 @@ public class TextInfoCleanUtil {
     private void insertTextInfo(List<TextInfoModel> list){
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
+        PreparedStatement pstm=null;
         try {
-            PreparedStatement pstm=connection.prepareStatement("insert into " +
+            pstm=connection.prepareStatement("insert into " +
                     "text_info(eid,sid,pid,pname,type,content,time,file_name,file_path) values(?,?,?,?,?,?,?,?,?)");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
@@ -94,11 +97,11 @@ public class TextInfoCleanUtil {
                 pstm.addBatch();//准备批量插入
             }
             pstm.executeBatch();//批量插入
-           // connection.commit();//别忘记提交
-            connection.close();
+
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,pstm,set);
         }
 
     }

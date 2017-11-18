@@ -86,15 +86,22 @@ public class DaoUtil {
         return c;
     }
 
-    public static void closeConnection(Connection connection){
-        if(connection!=null){
+    public static void closeConnection(Connection connection,PreparedStatement prep,ResultSet set){
+
             try {
-                if(!connection.isClosed()){
+                if(connection!=null&&!connection.isClosed()){
                     connection.close();
+                }
+                if(prep!=null&&!prep.isClosed()){
+                    prep.close();
+                }
+
+                if(set!=null&&!set.isClosed()){
+                    set.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
+
     }
 }

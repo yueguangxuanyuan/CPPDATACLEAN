@@ -42,8 +42,9 @@ public class DebugInfoCleanUtil {
         int num=0;
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         ResultSet set=null;
+        PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement(
+             prepar=connection.prepareStatement(
                     "select count(*) as num,file from breakpoint " +
                     " where tag is not null group by tag,file,file_line ");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
@@ -54,10 +55,11 @@ public class DebugInfoCleanUtil {
                     num=num+set.getInt("num")/2;
                 }
             }
-            connection.close();
+//            connection.close();
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,set);
         }
         return num;
     }
@@ -66,8 +68,9 @@ public class DebugInfoCleanUtil {
         int num=0;
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         ResultSet set=null;
+        PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement(
+             prepar=connection.prepareStatement(
                     "select count(*) as num,debug_target from debug_info  where type='run' " +
                             " group by debug_target");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
@@ -78,9 +81,11 @@ public class DebugInfoCleanUtil {
                     num=num+set.getInt("num");
                 }
             }
-            connection.close();
+//            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,set);
         }
         return num;
     }
@@ -88,8 +93,9 @@ public class DebugInfoCleanUtil {
     private void inserDebugInfo(List<DebugModel> models){
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
+        PreparedStatement pstm=null;
         try {
-            PreparedStatement pstm=connection.prepareStatement("insert into " +
+             pstm=connection.prepareStatement("insert into " +
                     "debug(eid,sid,pid,pname,break_point_num,debug_run_num) values(?,?,?,?,?,?)");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             for(DebugModel model:models){
@@ -102,11 +108,11 @@ public class DebugInfoCleanUtil {
                 pstm.addBatch();//准备批量插入
             }
             pstm.executeBatch();//批量插入
-            //connection.commit();//别忘记提交
-            connection.close();
+
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,pstm,set);
         }
     }
 
@@ -114,8 +120,9 @@ public class DebugInfoCleanUtil {
         List<String> list=new ArrayList<>();
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         ResultSet set=null;
+        PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement("select DISTINCT debug_target from debug_info");
+             prepar=connection.prepareStatement("select DISTINCT debug_target from debug_info");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
@@ -126,10 +133,10 @@ public class DebugInfoCleanUtil {
                 list.add(name.split("\\.")[0]);
             }
 
-            connection.close();
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,set);
         }
 
         return list;

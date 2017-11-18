@@ -120,8 +120,9 @@ public class BuildInfoCleanUtil {
         List<BuildRawInfoModel> list=new ArrayList<>();
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         ResultSet set=null;
+       PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement("select * from build_info");
+            prepar=connection.prepareStatement("select * from build_info");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
@@ -135,10 +136,11 @@ public class BuildInfoCleanUtil {
                 model.setContent(set.getString("content"));
                 list.add(model);
             }
-            connection.close();
+//            set.close();
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,set);
         }
         return list;
     }
@@ -147,9 +149,10 @@ public class BuildInfoCleanUtil {
     static void insertBuildInfoDetail(List<BuildInfoDetail> list){
       // System.out.println("插入一条信息："+list.size());
             Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
+            PreparedStatement pstm=null;
            // ResultSet set=null;
             try {
-                PreparedStatement pstm=connection.prepareStatement("insert into " +
+                pstm=connection.prepareStatement("insert into " +
                         "build_info(result_type,build_id,detail,result_info) values(?,?,?,?)");
                 //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
@@ -162,11 +165,11 @@ public class BuildInfoCleanUtil {
                     pstm.addBatch();//准备批量插入
                 }
                 pstm.executeBatch();//批量插入
-               // connection.commit();//别忘记提交
-                connection.close();
+               // connection.commit();//别忘
             } catch (SQLException e) {
-                DaoUtil.closeConnection(connection);
                 e.printStackTrace();
+            }finally {
+                DaoUtil.closeConnection(connection,pstm,null);
             }
     }
 
@@ -174,8 +177,9 @@ public class BuildInfoCleanUtil {
     public static void insertBuild(List<Build> list){
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
+        PreparedStatement pstm=null;
         try {
-            PreparedStatement pstm=connection.prepareStatement("insert into " +
+             pstm=connection.prepareStatement("insert into " +
                     "build(eid,sid,pid,pname,result,content,begintime,endtime) values(?,?,?,?,?,?,?,?)");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
@@ -192,11 +196,11 @@ public class BuildInfoCleanUtil {
                 pstm.addBatch();//准备批量插入
             }
             pstm.executeBatch();//批量插入
-            //connection.commit();//别忘记提交
-            connection.close();
+
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,pstm,null);
         }
     }
 
@@ -205,18 +209,20 @@ public class BuildInfoCleanUtil {
         int res=0;
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
+        PreparedStatement prepar=null;
         try {
-            PreparedStatement prepar=connection.prepareStatement("select max(id) as maxId from build");
+             prepar=connection.prepareStatement("select max(id) as maxId from build");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
                res=set.getInt("maxId");
                break;
             }
-            connection.close();
+//            connection.close();
         } catch (SQLException e) {
-            DaoUtil.closeConnection(connection);
             e.printStackTrace();
+        }finally {
+            DaoUtil.closeConnection(connection,prepar,null);
         }
         return res;
     }
