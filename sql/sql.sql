@@ -23,7 +23,7 @@ create table text_info(
 	pname varchar (255)  COMMENT '题目名称',
 	type varchar(255) COMMENT '类型，含COPY，CUT，PASTE',
 	content text COMMENT 'COPY，CUT，PASTE 的内容',
-	`time` datetime COMMENT '操作时间',
+	`time` varchar(255) COMMENT '操作时间',
 	file_name varchar(255),
 	file_path varchar(255),
 	primary key(id)
@@ -38,8 +38,8 @@ create table build(
 	pname varchar (255) not null COMMENT '项目的名称',
 	result varchar(255) COMMENT 'build的结果，值为SUCCESS,FAILED',
 	content text COMMENT '编译提示的结果',
-	`begintime` datetime,
-	`endtime` datetime,
+	`begintime` varchar(255),
+	`endtime` varchar(255),
 	PRIMARY Key(id)
 );
 
@@ -63,7 +63,7 @@ create table debug(
 	pname varchar (255)  COMMENT '题目名称，在没有题目id的情况下，只能使用题目名称来唯一辨别',
 	break_point_num int(10) default '0' COMMENT '设的断点的总数',
 	debug_run_num int(10) default '0' COMMENT '运行的次数',
-	debug_time datetime COMMENT 'debug的时间',
+	debug_time varchar(255) COMMENT 'debug的时间',
 	PRIMARY Key(id)
 );
 
@@ -93,7 +93,7 @@ create table test(
 );
 
 drop table if EXISTS varible;
-create table varible(
+create table variable(
 	id int(10) not null AUTO_INCREMENT COMMENT 'id主键',
 	sid int(10) not null COMMENT '学生的id',
 	eid int (10) not null COMMENT '考试id',
