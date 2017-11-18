@@ -56,6 +56,7 @@ public class DebugInfoCleanUtil {
             }
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
         return num;
@@ -104,6 +105,7 @@ public class DebugInfoCleanUtil {
             //connection.commit();//别忘记提交
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
     }
@@ -126,6 +128,7 @@ public class DebugInfoCleanUtil {
 
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
 

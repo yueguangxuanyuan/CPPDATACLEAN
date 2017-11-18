@@ -137,6 +137,7 @@ public class BuildInfoCleanUtil {
             }
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
         return list;
@@ -164,6 +165,7 @@ public class BuildInfoCleanUtil {
                // connection.commit();//别忘记提交
                 connection.close();
             } catch (SQLException e) {
+                DaoUtil.closeConnection(connection);
                 e.printStackTrace();
             }
     }
@@ -193,6 +195,7 @@ public class BuildInfoCleanUtil {
             //connection.commit();//别忘记提交
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
     }
@@ -212,6 +215,7 @@ public class BuildInfoCleanUtil {
             }
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
         return res;

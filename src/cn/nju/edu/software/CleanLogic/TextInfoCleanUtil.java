@@ -65,6 +65,7 @@ public class TextInfoCleanUtil {
             }
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
 
@@ -96,6 +97,7 @@ public class TextInfoCleanUtil {
            // connection.commit();//别忘记提交
             connection.close();
         } catch (SQLException e) {
+            DaoUtil.closeConnection(connection);
             e.printStackTrace();
         }
 
