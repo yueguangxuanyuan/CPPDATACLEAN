@@ -18,8 +18,8 @@ public class ZipUtil {
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry entry = null;
             while((entry=zis.getNextEntry())!=null){
-                //System.out.println(descDir+entry.getName());
                 File outFile = new File(descDir+entry.getName());
+
                 if(!outFile.exists()){
                     outFile.createNewFile();
                 }
@@ -43,5 +43,39 @@ public class ZipUtil {
             }
             return res;
         }
-
+    public  List<File> unzipLogdbFile(File zipFile, String descDir) {
+        List<File> res = new ArrayList<>();
+        try{
+            ZipFile zf = new ZipFile(zipFile);
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+            ZipEntry entry = null;
+            while((entry=zis.getNextEntry())!=null){
+                if(entry.getName().equals("Dao\\log.db")) {
+                    File outFile = new File(descDir + entry.getName());
+                    if (!outFile.getParentFile().exists()) {
+                        outFile.getParentFile().mkdir();
+                    }
+                    if (!outFile.exists()) {
+                        outFile.createNewFile();
+                    }
+                    BufferedInputStream bis = new BufferedInputStream(zf.getInputStream(entry));
+                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outFile));
+                    byte[] b = new byte[100];
+                    while (true) {
+                        int len = bis.read(b);
+                        if (len == -1)
+                            break;
+                        bos.write(b, 0, len);
+                    }
+                    // close stream
+                    bis.close();
+                    bos.close();
+                    res.add(outFile);
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 }

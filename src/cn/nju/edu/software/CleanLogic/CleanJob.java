@@ -24,11 +24,11 @@ public class CleanJob {
             current_id = -1;
             System.out.println("EXAM "+i+" : start clean data");
             List<CommitModel> commitList = dataUtil.getCommitHistory(i);
-            anayzeCommit(commitList);
+            anayzeCommit(commitList,i);
 
         }
     }
-    public void anayzeCommit(List<CommitModel> commitList){
+    public void anayzeCommit(List<CommitModel> commitList,int e_id){
 
         for(CommitModel c:commitList){
             String _logP = c.getLog();
@@ -47,14 +47,27 @@ public class CleanJob {
             //解压log压缩包和monitor压缩包
             File logFile = new File(logP);
             File monitorFile = new File(monitorP);
-            zipUtil.unzipFile(logFile,ConstantConfig.LOGUNZIPPATH);
-            zipUtil.unzipFile(monitorFile,ConstantConfig.MONITORUNZIPPATH);
+
+            String log_unzip_path = logP.replace(".zip","");
+            String monitor_unzip_path = monitorP.replace(".zip","");
+
+            try {
+                File log_dir = new File(log_unzip_path);
+                log_dir.mkdir();
+                File monitor_dir = new File(monitor_unzip_path);
+                monitor_dir.mkdir();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            zipUtil.unzipFile(logFile,log_unzip_path);
+            zipUtil.unzipLogdbFile(monitorFile,monitor_unzip_path);
 
             //monitor数据logdb的去重
             if(c.getUser_id()!=current_id){
                 //从本地临时数据库进行数据分析，结果插入最终的数据库，七个模块
                 //清空数据库
                 dataUtil.cleanTempDatabase();
+                current_id = c.getUser_id();
             }
             //插入数据库
             String logdb_path = monitorP.replace(".zip","")+"/Dao/log.db";
@@ -65,7 +78,11 @@ public class CleanJob {
             * -------------------------------------------------------数据插入完成---------------------------------------------
             * */
             //log的解析..
-
+            String serverlog_dir = logP.replace(".zip","");
+            File[] flist  = new File(serverlog_dir).listFiles();
+            for(File f:flist) {
+                dataUtil.insertDataFromServerLog(f.getAbsolutePath(),e_id,c.getUser_id());
+            }
             //
 
         }

@@ -85,10 +85,10 @@ create table test(
 	eid int (10) not null COMMENT '考试id',
 	sid int(10) not null COMMENT '学生的id',
 	pid int (10) not null COMMENT '题目id',
-	score int(10) default '0' COMMENT '最高得分数',
+	score REAL default '0' COMMENT '得分数',
 	accept_case varchar(255) COMMENT '通过的测试用例，使用字符串连接表示，',
 	wrong_answer varchar(255) COMMENT '没通过的测试用例',
-	test_time datetime COMMENT '测试时间',
+	test_time VARCHAR(255) COMMENT '测试时间',
 	PRIMARY Key(id)
 );
 
