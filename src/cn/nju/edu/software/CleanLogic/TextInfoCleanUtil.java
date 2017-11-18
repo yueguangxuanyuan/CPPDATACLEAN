@@ -17,7 +17,9 @@ import java.util.List;
  */
 public class TextInfoCleanUtil {
     public static void main(String args[]) {
-        readRawCommandTextData();
+       // readRawCommandTextData();
+        TextInfoCleanUtil textInfoCleanUtil=new TextInfoCleanUtil();
+        textInfoCleanUtil.cleanTextInfo(1,1);
     }
 
 
@@ -58,6 +60,7 @@ public class TextInfoCleanUtil {
                 model.setName(set.getString("name"));
                 model.setHappenTime(set.getString("happentime"));
                 model.setProjectName(set.getString("project"));
+                model.setTime(set.getString("time"));
                 list.add(model);
             }
         } catch (SQLException e) {
@@ -68,28 +71,29 @@ public class TextInfoCleanUtil {
     }
 
     private void insertTextInfo(List<TextInfoModel> list){
-        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
         try {
             PreparedStatement pstm=connection.prepareStatement("insert into " +
-                    "text_info(eid,sid,pid,panme,type,content,time,file_name,file_path) values(?,?,?,?,?,?,?,?,?,?)");
+                    "text_info(eid,sid,pid,pname,type,content,time,file_name,file_path) values(?,?,?,?,?,?,?,?,?)");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
-            for (int i = 1; i <= list.size(); i++) {
+            for (int i = 0; i < list.size(); i++) {
                 TextInfoModel model=list.get(i);
                 pstm.setInt(1,model.getEid());
                 pstm.setInt(2,model.getSid());
                 pstm.setInt(3,model.getPid());
-                pstm.setString(5,model.getProjectName());
-                pstm.setString(6,model.getType());
-                pstm.setString(7,model.getContent());
-                pstm.setString(8,model.getTime());
-                pstm.setString(9,model.getFileName());
-                pstm.setString(10,model.getFilePath());
+                pstm.setString(4,model.getProjectName());
+                pstm.setString(5,model.getType());
+                pstm.setString(6,model.getContent());
+                pstm.setString(7,model.getTime());
+                pstm.setString(8,model.getFileName());
+                pstm.setString(9,model.getFilePath());
                 pstm.addBatch();//准备批量插入
             }
             pstm.executeBatch();//批量插入
-            connection.commit();//别忘记提交
+           // connection.commit();//别忘记提交
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

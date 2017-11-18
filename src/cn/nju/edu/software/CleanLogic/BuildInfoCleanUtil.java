@@ -21,18 +21,8 @@ import java.util.regex.Pattern;
 public class BuildInfoCleanUtil {
 
     public static void main(String args[]) {
-        //readRawBuildInfo();
-        String content="1>------ Build started: Project: Q70, Configuration: Debug Win32 ------\n" +
-                "1>  Microsoft (R) C/C++ Optimizing Compiler Version 18.00.31101 for x86\n" +
-                "1>  Copyright (C) Microsoft Corporation.  All rights reserved.\n" +
-                "1>  \n" +
-                "1>  cl /c /ZI /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo\"Debug\\\\\" /Fd\"Debug\\vc120.pdb\" /Gd /TP /analyze- /errorReport:prompt Q70.cpp\n" +
-                "1>  \n" +
-                "1>  Q70.cpp\n" +
-                "1>e:\\研一\\c++助教\\cppexercise\\exercise1\\cpp_solution\\q70\\q70\\q70.cpp(126): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data\n" +
-                "1>e:\\研一\\c++助教\\cppexercise\\exercise1\\cpp_solution\\q70\\q70\\q70.cpp(127): warning C42244: 'initializing' : conversion from 'double' to 'int', possible loss of data\n" +
-                "========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========";
-        buildInfoDetailList(1,content,"warning");
+        BuildInfoCleanUtil buildInfoCleanUtil=new BuildInfoCleanUtil();
+        buildInfoCleanUtil.cleanBuild(1,1);
     }
 
 
@@ -55,16 +45,16 @@ public class BuildInfoCleanUtil {
             build.setEndTime(buildRawInfoModel.getEndTime());
             build.setProjectName(projectNameFromContent(content));//设置该项目的名称
             build.setResult(buildResultFromContent(content));
-            List<BuildInfoDetail> buildInfoDetails=buildInfoDetailList(buildId,content,"ERROR");
-            if(buildInfoDetails!=null&&buildInfoDetails.size()!=0){
-                detailList.addAll(buildInfoDetails);
+            List<BuildInfoDetail> buildInfoDetailsE=buildInfoDetailList(buildId,content,"ERROR");
+            if(buildInfoDetailsE!=null&&buildInfoDetailsE.size()!=0){
+                detailList.addAll(buildInfoDetailsE);
             }
 
-            List<BuildInfoDetail> buildInfoDetailsE=buildInfoDetailList(buildId,content,"WARNING");
-            if(buildInfoDetailsE!=null&&buildInfoDetails.size()!=0){
-                detailList.addAll(buildInfoDetails);
+            List<BuildInfoDetail> buildInfoDetailsW=buildInfoDetailList(buildId,content,"WARNING");
+            if(buildInfoDetailsE!=null&&buildInfoDetailsW.size()!=0){
+                detailList.addAll(buildInfoDetailsW);
             }
-
+            buildList.add(build);
         }
 
         insertBuild(buildList);
@@ -73,7 +63,7 @@ public class BuildInfoCleanUtil {
 
     private  String projectNameFromContent(String content){
         String project=null;
-        Pattern projectNamePattern=Pattern.compile("Q(\\d+).exe");
+        Pattern projectNamePattern=Pattern.compile("Q(\\d+).c");
         Matcher m = projectNamePattern.matcher(content);
         while (m.find()) {
             project=m.group();
@@ -95,7 +85,7 @@ public class BuildInfoCleanUtil {
         while (m.find()) {
             line=m.group();
             System.out.println("正则表达式获取到的项目名称： "+line);
-            line=line.substring(1,line.length()-1);
+            line=line.substring(1,line.length()-1).trim();
             String s[]=line.split(" ");
             BuildInfoDetail buildInfoDetail=new BuildInfoDetail();
             buildInfoDetail.setBuildId(buildId);
@@ -131,6 +121,7 @@ public class BuildInfoCleanUtil {
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
+                System.out.println("读取到一条BuildInfo的信息");
                 BuildRawInfoModel model=new BuildRawInfoModel();
                 model.setId(set.getInt("id"));
                 model.setTime(set.getString("time"));
@@ -148,14 +139,15 @@ public class BuildInfoCleanUtil {
 
     //插入每一条编译结果的详情。
     static void insertBuildInfoDetail(List<BuildInfoDetail> list){
-            Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+       System.out.println("插入一条信息："+list.size());
+            Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
            // ResultSet set=null;
             try {
                 PreparedStatement pstm=connection.prepareStatement("insert into " +
                         "build_info(result_type,build_id,detail,result_info) values(?,?,?,?)");
                 //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
-                for (int i = 1; i <= list.size(); i++) {
+                for (int i = 0; i < list.size(); i++) {
                     BuildInfoDetail model=list.get(i);
                     pstm.setString(1,model.getResultType());
                     pstm.setInt(2,model.getBuildId());
@@ -164,7 +156,7 @@ public class BuildInfoCleanUtil {
                     pstm.addBatch();//准备批量插入
                 }
                 pstm.executeBatch();//批量插入
-                connection.commit();//别忘记提交
+               // connection.commit();//别忘记提交
                 connection.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -173,14 +165,14 @@ public class BuildInfoCleanUtil {
 
     //插入每一次build的结果
     public static void insertBuild(List<Build> list){
-        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
         try {
             PreparedStatement pstm=connection.prepareStatement("insert into " +
-                    "build(eid,sid,pid,panme,result,content,begintime,endtime,pname) values(?,?,?,?,?,?,?,?,?)");
+                    "build(eid,sid,pid,pname,result,content,begintime,endtime) values(?,?,?,?,?,?,?,?)");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
 
-            for (int i = 1; i <= list.size(); i++) {
+            for (int i = 0; i < list.size(); i++) {
                 Build model=list.get(i);
                 pstm.setInt(1,model.getEid());
                 pstm.setInt(2,model.getSid());
@@ -190,11 +182,10 @@ public class BuildInfoCleanUtil {
                 pstm.setString(6,model.getContent());
                 pstm.setString(7,model.getBegingTime());
                 pstm.setString(8,model.getEndTime());
-                pstm.setString(9,model.getProjectName());
                 pstm.addBatch();//准备批量插入
             }
             pstm.executeBatch();//批量插入
-            connection.commit();//别忘记提交
+            //connection.commit();//别忘记提交
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -204,7 +195,7 @@ public class BuildInfoCleanUtil {
     //获取build的最大id值
     private int maxBuildId(){
         int res=0;
-        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
         try {
             PreparedStatement prepar=connection.prepareStatement("select max(id) as maxId from build");

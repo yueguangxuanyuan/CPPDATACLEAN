@@ -16,6 +16,9 @@ public class CleanJob {
     DataUtil dataUtil = new DataUtil();
     ZipUtil zipUtil = new ZipUtil();
     int current_id = -1;
+    BuildInfoCleanUtil buildInfoCleanUtil=new BuildInfoCleanUtil();
+    DebugInfoCleanUtil debugInfoCleanUtil=new DebugInfoCleanUtil();
+    TextInfoCleanUtil textInfoCleanUtil=new TextInfoCleanUtil();
     public  void doClean(List<Integer> examid ){
         for(int i:examid) {
             current_id = -1;
@@ -66,5 +69,12 @@ public class CleanJob {
             //
 
         }
+    }
+
+    //从临时数据库进行清洗的入口函数
+    private void clean(int sid,int eid){
+        buildInfoCleanUtil.cleanBuild(sid,eid);
+        textInfoCleanUtil.cleanTextInfo(sid,eid);
+        debugInfoCleanUtil.cleanDebugInfo(sid,eid);
     }
 }

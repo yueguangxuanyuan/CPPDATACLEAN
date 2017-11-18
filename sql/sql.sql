@@ -35,7 +35,7 @@ create table build(
 	eid int (10) not null COMMENT '考试id',
 	sid int(10) not null COMMENT '学生的id',
 	pid int (10) not null COMMENT '题目id',
-	pname int (10) not null COMMENT '项目的名称',
+	pname varchar (255) not null COMMENT '项目的名称',
 	result varchar(255) COMMENT 'build的结果，值为SUCCESS,FAILED',
 	content text COMMENT '编译提示的结果',
 	`begintime` datetime,
@@ -61,8 +61,8 @@ create table debug(
 	sid int(10) not null COMMENT '学生的id',
 	pid int (10) not null COMMENT '题目id',
 	pname varchar (255)  COMMENT '题目名称，在没有题目id的情况下，只能使用题目名称来唯一辨别',
-	break_point__num int(10) default '0' COMMENT '设的断点的总数',
-	debug_num int(10) default '0' COMMENT '运行的次数',
+	break_point_num int(10) default '0' COMMENT '设的断点的总数',
+	debug_run_num int(10) default '0' COMMENT '运行的次数',
 	debug_time datetime COMMENT 'debug的时间',
 	PRIMARY Key(id)
 );
