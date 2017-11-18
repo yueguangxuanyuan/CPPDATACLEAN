@@ -21,9 +21,12 @@ public class DataUtil {
         if(c!=null){
             //得到logdb库中的数据
             try {
-                c.setAutoCommit(false);
+                //c.setAutoCommit(false);
                 Statement s = c.createStatement();
                 ResultSet rs = s.executeQuery("SELECT * FROM "+tableName+";");
+                if(rs==null){
+                    System.out.println("rs 为null");
+                }
                 s.close();
                 c.close();
                 return rs;
@@ -41,40 +44,80 @@ public class DataUtil {
         if(c!=null){
             try {
                 Statement s = c.createStatement();
-                String sql = "select isnull((select top(1) 1 from"+ tableName +"where id = "+id+"), 0)";
-                int isEx = s.executeQuery(sql).getInt(1);
-                if(isEx==1){
+                String sql = "select count(*) from "+tableName+" where id= "+id+";";
+                ResultSet rs = s.executeQuery(sql);
+                rs.next();
+                int isEx = rs.getInt(1);
+
+                if(isEx>=1){
+                    rs.close();
+                    s.close();
+                    c.close();
                     return true;
                 }else{
+                    rs.close();
+                    s.close();
+                    c.close();
                     return false;
                 }
             }catch (Exception e){
                 e.printStackTrace();
             }
+        }else{
+            System.out.println("temp base connect error");
         }
         return true;
     }
 
     private boolean isExistsTemp(String tableName,ResultSet rs){
+        Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         try {
+            //System.out.println(rs.getObject(6).toString());
             ResultSetMetaData rsm = rs.getMetaData();
             int count = rsm.getColumnCount();
-            Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+            //System.out.println(count);
+
             if(c!=null){
-                Statement s = c.createStatement();
+                //Statement s = c.createStatement();
                 String sql = "";
-                for(int i=1;i<count;i++){
-                    sql += rsm.getColumnName(i)+"='"+rs.getObject(i).toString()+"'and";
+                for(int i=2;i<count;i++){
+                    String n = rsm.getColumnName(i);
+                    if(n.equals("condition")){
+                        n = "`"+n+"`";
+                    }
+                    sql += n+"= ? and ";
                 }
-                sql+= rsm.getColumnName(count)+"='"+rs.getObject(count).toString()+"';";
+                sql+= rsm.getColumnName(count)+"= ?;";
                 String exesql = "select count(*) from "+tableName+" where "+sql;
-                int isEx = s.executeQuery(exesql).getInt(1);
-                if(isEx==1){
+                //System.out.println(exesql);
+                PreparedStatement s = c.prepareStatement(exesql);
+                for(int i=2;i<=count;i++){
+
+                    s.setObject(i-1,rs.getObject(i));
+                    //System.out.println(i+":"+rs.getObject(i).toString());
+                }
+                ResultSet trs = s.executeQuery();
+                trs.next();
+                int isEx = trs.getInt(1);
+                if(isEx>0){
+                    trs.close();
+                    s.close();
+                    c.close();
                     return true;
                 }else{
+                    trs.close();
+                    s.close();
+                    c.close();
                     return false;
                 }
             }
+
+            c.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            c.close();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -111,6 +154,7 @@ public class DataUtil {
                     if(j.has("AC")) {
                         JsonArray ac_case = j.get("AC").getAsJsonArray();
                         ac_count = ac_case.size();
+                        total_count +=ac_case.size();
                         for(int i=0;i<ac_count;i++){
                             accept_case+=ac_case.get(i).toString()+";";
                         }
@@ -134,19 +178,22 @@ public class DataUtil {
                     double score =temps.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     score = score*100;
 
-                    System.out.println("std:"+s_id+" ac:"+accept_case+" wa:"+wrong_answer+" score:"+score);
+                    //System.out.println("std:"+s_id+" ac:"+accept_case+" wa:"+wrong_answer+" score:"+score);
 
                     boolean isExist = false;
                     Connection c = DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
                     if(c!=null){
                         //确保日志不重复
                         try{
-                            String sql = "select count(*) from test where test_time = '"+time+"';";
+                            String sql = "select count(*) from test where test_time = '"+time+"' and eid = '"+exam_id+"' and pid = '"+question_id+"';";
                             Statement s = c.createStatement();
                             ResultSet rs = s.executeQuery(sql);
+                            rs.next();
                             if(rs.getInt(1)==1){
                                 isExist = true;
                             }
+                            rs.close();
+                            s.close();
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -186,8 +233,8 @@ public class DataUtil {
         if(c!=null){
             try {
                 s = c.prepareStatement(sql);
-                s.setString(1,String.valueOf(exam_id));
-                ResultSet rs = s.executeQuery(sql);
+                s.setInt(1,exam_id);
+                ResultSet rs = s.executeQuery();
                 while(rs.next()){
                     CommitModel temp = new CommitModel(rs.getString("log"),rs.getInt("user_id"),rs.getString("monitor"),rs.getTimestamp("create_time"));
                     res.add(temp);
@@ -226,44 +273,80 @@ public class DataUtil {
     }
 
     public void insertToTempDatabase(String logdbPath,String tableName){
+        System.out.println("insert into "+tableName +" from "+logdbPath);
         Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
+        Connection sqlitec  = DaoUtil.getSqliteConnection(logdbPath);
+        List<String> columnList = new ArrayList<>();
         try{
-            ResultSet rs = getDataFromLogDB(logdbPath,tableName);
-            ResultSetMetaData rsm  = rs.getMetaData();
-            int columnCount = rsm.getColumnCount();
+//            ResultSetMetaData rsm  = rs.getMetaData();
+//            int columnCount = rsm.getColumnCount();
+            //获取列的名字
+            String columnSql = "show columns from "+tableName+";";
+            Statement columnS = c.createStatement();
+            ResultSet columnRs = columnS.executeQuery(columnSql);
+            int columnCount = 0;
+            while (columnRs.next()){
+                columnCount++;
+                columnList.add(columnRs.getString(1));
+                //System.out.println(columnRs.getString(1));
+            }
+            //ResultSet rs = getDataFromLogDB(logdbPath,tableName);
+            //Connection sqlitec  = DaoUtil.getSqliteConnection(logdbPath);
+            //sqlitec.setAutoCommit(false);
+            Statement s = sqlitec.createStatement();
+            ResultSet rs = s.executeQuery("SELECT * FROM "+tableName+";");
+
+            String col = "(";
+            String value = "(";
+            for (int i = 2; i <= columnCount; i++) {
+                String colName = columnList.get(i-1);
+                if(colName.equals("condition")){
+                    colName = "`"+colName+"`";
+                }
+                col += colName + ",";
+                value += "?,";
+            }
+            col = col.substring(0, col.length() - 1);
+            col = col + ")";
+            value = value.substring(0, value.length() - 1);
+            value = value + ");";
+            String sql = "insert into " + tableName + col + " values" + value;
+            PreparedStatement ps = c.prepareStatement(sql);
+
                 while (rs.next()) {
                     //读取数据
+
                     //Map<String,Object> tmpMap = new HashMap<>();
                     int d_id = rs.getInt("id");
-                    boolean isExists = isExistsTemp(tableName,d_id);
+                    boolean isExists = isExistsTemp(tableName,rs);
                     //放进mysql
                     if(!isExists){
                         //插入数据
-                        boolean isEx = isExistsTemp(tableName,rs);
-                        if(!isEx) {
-                            String col = "(";
-                            String value = "(";
-                            for (int i = 1; i <= columnCount; i++) {
-                                String colName = rsm.getColumnLabel(i);
-                                col += colName + ",";
-                                value += "?,";
+                            for (int i = 2; i <= columnCount; i++) {
+                                ps.setObject(i-1, rs.getObject(i));
                             }
-                            col = col.substring(0, col.length() - 1);
-                            col = col + ")";
-                            value = value.substring(0, value.length() - 1);
-                            value = value + ");";
-                            String sql = "insert into " + tableName + col + " values" + value;
-                            PreparedStatement ps = c.prepareStatement(sql);
-                            for (int i = 1; i <= columnCount; i++) {
-                                ps.setString(i, rs.getObject(i).toString());
-                            }
-                            ps.executeUpdate();
-                            ps.close();
-                        }
+                            ps.addBatch();
+
+                    }else{
+                        System.out.println("已经存在");
                     }
                 }
+            ps.executeBatch();
+            ps.close();
+            s.close();
+            sqlitec.close();
+            columnRs.close();
+            columnS.close();
             rs.close();
             c.close();
+            //System.out.println(tableName + "close");
+        }catch (Exception e){
+
+            e.printStackTrace();
+        }
+        try{
+            c.close();
+            sqlitec.close();
         }catch (Exception e){
             e.printStackTrace();
         }

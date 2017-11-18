@@ -65,7 +65,7 @@ public class DaoUtil {
         Connection c = null;
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            c = DriverManager.getConnection(ConstantConfig.MYSQLURL+database, ConstantConfig.MYSQLUSERNAME, ConstantConfig.MYSQLPASSWORD);
+            c = DriverManager.getConnection(ConstantConfig.MYSQLURL+database+"?useSSL=true", ConstantConfig.MYSQLUSERNAME, ConstantConfig.MYSQLPASSWORD);
         }catch (Exception e){
             e.printStackTrace();
         }
