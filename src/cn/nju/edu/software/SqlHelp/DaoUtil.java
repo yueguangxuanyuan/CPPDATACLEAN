@@ -25,6 +25,20 @@ public class DaoUtil {
 
         }
     }
+    public static void executeUpdate(Connection c,String sql){
+        Statement s = null;
+        if(c!=null){
+            try {
+                s = c.createStatement();
+                s.executeUpdate(sql);
+                s.close();
+                c.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
     /*
     * 建最后的存储表，直接执行sql
     * */
@@ -65,7 +79,7 @@ public class DaoUtil {
         Connection c = null;
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            c = DriverManager.getConnection(ConstantConfig.MYSQLURL+database, ConstantConfig.MYSQLUSERNAME, ConstantConfig.MYSQLPASSWORD);
+            c = DriverManager.getConnection(ConstantConfig.MYSQLURL+database+"?useSSL=true", ConstantConfig.MYSQLUSERNAME, ConstantConfig.MYSQLPASSWORD);
         }catch (Exception e){
             e.printStackTrace();
         }
