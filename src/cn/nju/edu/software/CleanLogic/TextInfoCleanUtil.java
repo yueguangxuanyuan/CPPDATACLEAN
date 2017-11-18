@@ -52,7 +52,7 @@ public class TextInfoCleanUtil {
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
-                System.out.println("获得一条数据： "+set.getString("content"));
+               // System.out.println("获得一条数据： "+set.getString("content"));
                 CommandTextModel model=new CommandTextModel();
                 model.setContent(set.getString("content"));
                 model.setAction(set.getString("action"));

@@ -43,7 +43,11 @@ public class BuildInfoCleanUtil {
             build.setContent(content);
             build.setBegingTime(buildRawInfoModel.getStartTime());
             build.setEndTime(buildRawInfoModel.getEndTime());
-            build.setProjectName(projectNameFromContent(content));//设置该项目的名称
+            String projectName=projectNameFromContent(content);
+            if(projectName==null){
+                continue;
+            }
+            build.setProjectName(projectName);//设置该项目的名称
             build.setResult(buildResultFromContent(content));
             List<BuildInfoDetail> buildInfoDetailsE=buildInfoDetailList(buildId,content,"ERROR");
             if(buildInfoDetailsE!=null&&buildInfoDetailsE.size()!=0){
@@ -67,7 +71,7 @@ public class BuildInfoCleanUtil {
         Matcher m = projectNamePattern.matcher(content);
         while (m.find()) {
             project=m.group();
-            System.out.println("正则表达式获取到的项目名称： "+project);
+           // System.out.println("正则表达式获取到的项目名称： "+project);
            break;
         }
         return project;
@@ -84,7 +88,7 @@ public class BuildInfoCleanUtil {
         String line;
         while (m.find()) {
             line=m.group();
-            System.out.println("正则表达式获取到的项目名称： "+line);
+            //System.out.println("正则表达式获取到的项目名称： "+line);
             line=line.substring(1,line.length()-1).trim();
             String s[]=line.split(" ");
             BuildInfoDetail buildInfoDetail=new BuildInfoDetail();
@@ -121,7 +125,7 @@ public class BuildInfoCleanUtil {
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
             while(set.next()) {
-                System.out.println("读取到一条BuildInfo的信息");
+                //System.out.println("读取到一条BuildInfo的信息");
                 BuildRawInfoModel model=new BuildRawInfoModel();
                 model.setId(set.getInt("id"));
                 model.setTime(set.getString("time"));
@@ -139,7 +143,7 @@ public class BuildInfoCleanUtil {
 
     //插入每一条编译结果的详情。
     static void insertBuildInfoDetail(List<BuildInfoDetail> list){
-       System.out.println("插入一条信息："+list.size());
+      // System.out.println("插入一条信息："+list.size());
             Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
            // ResultSet set=null;
             try {
