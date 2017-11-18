@@ -262,28 +262,37 @@ public class DataUtil {
     }
 
     public void cleanTempDatabase(){
-        String sql = "TRUNCATE TABLE build_info;\n" +
-                "TRUNCATE TABLE build_project_info;\n" +
-                "TRUNCATE TABLE command_text;\n" +
-                "TRUNCATE TABLE command_file;\n" +
-                "TRUNCATE TABLE content_info;\n" +
-                "TRUNCATE TABLE debug_info;\n" +
-                "TRUNCATE TABLE debug_break;\n" +
-                "TRUNCATE TABLE breakpoint;\n" +
-                "TRUNCATE TABLE debug_run;\n" +
-                "TRUNCATE TABLE exception;\n" +
-                "TRUNCATE TABLE debug_exception_thrown;\n" +
-                "TRUNCATE TABLE debug_exception_not_handled;\n" +
-                "TRUNCATE TABLE local_variable;\n" +
-                "TRUNCATE TABLE breakpoint_event;\n" +
-                "TRUNCATE TABLE solution_open_event;\n" +
-                "TRUNCATE TABLE file_event;";
+
+        String[] strList = {"TRUNCATE TABLE build_info;",
+                "TRUNCATE TABLE build_project_info;",
+                "TRUNCATE TABLE command_text;" ,
+                "TRUNCATE TABLE command_file;" ,
+                "TRUNCATE TABLE content_info;" ,
+                "TRUNCATE TABLE debug_info;" ,
+                "TRUNCATE TABLE breakpoint;" ,
+                "TRUNCATE TABLE solution_open_event;",
+                "TRUNCATE TABLE file_event;"};
         Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
-        DaoUtil.executeUpdate(c,sql);
+
+        for(String i:strList){
+            try {
+                PreparedStatement s = c.prepareStatement(i);
+                s.executeUpdate();
+                s.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        try {
+            c.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        //DaoUtil.executeUpdate(c,sql);
     }
 
     public void insertToTempDatabase(String logdbPath,String tableName){
-        //System.out.println("insert into "+tableName +" from "+logdbPath);
+        System.out.println("insert into "+tableName +" from "+logdbPath);
         //Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         Connection sqlitec  = DaoUtil.getSqliteConnection(logdbPath);
         List<String> columnList = new ArrayList<>();
@@ -306,8 +315,12 @@ public class DataUtil {
             Statement s = sqlitec.createStatement();
             ResultSet rs = s.executeQuery("SELECT * FROM "+tableName+";");
 
-            String col = "(";
+            String col ="(";
             String value = "(";
+            if(tableName.equals("breakpoint")) {
+                value = "(?,";
+                col = "(id,";
+            }
             for (int i = 2; i <= columnCount; i++) {
                 String colName = columnList.get(i-1);
                 if(colName.equals("condition")){
@@ -320,25 +333,37 @@ public class DataUtil {
             col = col + ")";
             value = value.substring(0, value.length() - 1);
             value = value + ");";
-            String sql = "insert into " + tableName + col + " values" + value;
+            String sql = "";
+            if(tableName.equals("breakpoint")) {
+                sql = "insert into " + tableName + col + " values" + value;
+            }else{
+                sql = "insert ignore into " + tableName + col + " values" + value;
+            }
+            //System.out.println(sql);
             PreparedStatement ps = tempbaseCon.prepareStatement(sql);
 
                 while (rs.next()) {
                     //读取数据
+                    if(!tableName.equals("breakpoint")){
+                        for (int i = 2; i <= columnCount; i++) {
+                            ps.setObject(i - 1, rs.getObject(i));
+                        }
+                        ps.addBatch();
+                    }else {
+                        //Map<String,Object> tmpMap = new HashMap<>();
 
-                    //Map<String,Object> tmpMap = new HashMap<>();
-                    int d_id = rs.getInt("id");
-                    boolean isExists = isExistsTemp(tableName,rs);
-                    //放进mysql
-                    if(!isExists){
-                        //插入数据
-                            for (int i = 2; i <= columnCount; i++) {
-                                ps.setObject(i-1, rs.getObject(i));
+                        boolean isExists = isExistsTemp(tableName, rs);
+                        //放进mysql
+                        if (!isExists) {
+                            //插入数据
+                            for (int i = 1; i <= columnCount; i++) {
+                                ps.setObject(i, rs.getObject(i));
                             }
                             ps.addBatch();
 
-                    }else{
-                        //System.out.println("已经存在");
+                        } else {
+                            //System.out.println("已经存在");
+                        }
                     }
                 }
             ps.executeBatch();
