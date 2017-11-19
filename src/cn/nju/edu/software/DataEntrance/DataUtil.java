@@ -183,7 +183,11 @@ public class DataUtil {
                             wrong_answer+=re_case.get(i).toString();
                         }
                     }
-                    double tscore = (double)ac_count/(double)total_count;
+                    double tscore = 0;
+                    if(total_count!=0){
+                        tscore= (double)ac_count/(double)total_count;
+                    }
+
                     BigDecimal temps = new BigDecimal(tscore);
                     double score =temps.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     score = score*100;

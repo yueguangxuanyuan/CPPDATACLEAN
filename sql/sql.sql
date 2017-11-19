@@ -63,7 +63,7 @@ create table debug(
 	pname varchar (255)  COMMENT '题目名称，在没有题目id的情况下，只能使用题目名称来唯一辨别',
 	break_point_num int(10) default '0' COMMENT '设的断点的总数',
 	debug_run_num int(10) default '0' COMMENT '运行的次数',
-	debug_time varchar(255) COMMENT 'debug的时间',
+	debugTime varchar(255) COMMENT 'debug的时间',
 	PRIMARY Key(id)
 );
 
