@@ -183,7 +183,10 @@ public class DataUtil {
                             wrong_answer+=re_case.get(i).toString();
                         }
                     }
-                    double tscore = (double)ac_count/(double)total_count;
+                    double tscore = 0;
+                    if(total_count!=0) {
+                        tscore = (double) ac_count / (double) total_count;
+                    }
                     BigDecimal temps = new BigDecimal(tscore);
                     double score =temps.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                     score = score*100;
@@ -226,6 +229,7 @@ public class DataUtil {
                                 e.printStackTrace();
                             }
                         }
+                        c.close();
                     }
                 }
 
@@ -292,7 +296,7 @@ public class DataUtil {
     }
 
     public void insertToTempDatabase(String logdbPath,String tableName){
-        System.out.println("insert into "+tableName +" from "+logdbPath);
+        //System.out.println("insert into "+tableName +" from "+logdbPath);
         //Connection c = DaoUtil.getMySqlConnection(ConstantConfig.TEMPBASE);
         Connection sqlitec  = DaoUtil.getSqliteConnection(logdbPath);
         List<String> columnList = new ArrayList<>();
@@ -335,7 +339,7 @@ public class DataUtil {
             value = value + ");";
             String sql = "";
             if(tableName.equals("breakpoint")) {
-                sql = "insert into " + tableName + col + " values" + value;
+                sql = "insert ignore into " + tableName + col + " values" + value;
             }else{
                 sql = "insert ignore into " + tableName + col + " values" + value;
             }

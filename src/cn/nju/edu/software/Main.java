@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) {
         CleanJob c = new CleanJob();
-        int[] eid = {36,38};
+        int[] eid = {36,41};
         c.doClean(eid);
 //        DataUtil d = new DataUtil();
 //        d.cleanTempDatabase();
