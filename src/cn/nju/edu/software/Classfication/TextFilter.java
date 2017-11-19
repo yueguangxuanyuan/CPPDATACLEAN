@@ -98,12 +98,12 @@ public class TextFilter {
         PreparedStatement prepar=null;
         try {
             prepar=connection.prepareStatement("select *  from text_info where" +
-                    " pid=? and sid=? and type in ('CUT','COPY') and content=? and time<?");
+                    " pname=? and sid=? and type in ('CUT','COPY') and content=?");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
-            prepar.setInt(1,model.getPid());
+            prepar.setString(1,"Q"+model.getPid());
             prepar.setInt(2,model.getSid());
             prepar.setString(3,model.getContent());
-            prepar.setString(4,model.getTime());
+           // prepar.setString(4,model.getTime());
             // prepar.setInt(2,pId);
             set=prepar.executeQuery();
             while(set.next()) {
