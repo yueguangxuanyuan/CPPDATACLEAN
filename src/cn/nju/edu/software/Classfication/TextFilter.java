@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zuce wei on 2017/11/19.
@@ -20,7 +22,7 @@ public class TextFilter {
         ScoreFilter scoreFilter=new ScoreFilter();
         TextFilter textFilter=new TextFilter();
         List<Student> list=scoreFilter.filter(2,2);
-        list=textFilter.filter(2,list,20);
+        list=textFilter.filter(2,list,20).get(1);
         for(Student student:list){
             System.out.println(student.toString());
         }
@@ -32,11 +34,14 @@ public class TextFilter {
         return list;
     }
 
-    public List<Student> filter(int qid,List<Student> list,int longCopyLength){
+    public Map<Integer,List<Student>> filter(int qid,List<Student> list,int longCopyLength){
+        Map<Integer,List<Student>> map=new HashMap<>();
         List<Student> res=new ArrayList<>();
+        List<Student> noCopyStudent=new ArrayList<>();//，没有使用copy的学生
         List<TextInfoModel> textInfoModels;
         for(Student student:list){
             textInfoModels=getTextInfoModelFromDB(student.getStudentId(),qid,longCopyLength);
+            boolean isAdd=false;
             if(textInfoModels!=null&&textInfoModels.size()!=0){//存在有长copy的学生
                 int externalNum=0;
                 for(TextInfoModel textInfoModel:textInfoModels){
@@ -47,9 +52,17 @@ public class TextFilter {
                 student.setExternalCopy(externalNum);
                 student.setLongCopy(textInfoModels.size());
                 res.add(student);
+                isAdd=true;
+            }
+            if(!isAdd){
+                student.setExternalCopy(0);
+                student.setLongCopy(0);
+                noCopyStudent.add(student);
             }
         }
-        return res;
+        map.put(1,res);
+        map.put(2,noCopyStudent);
+        return map;
     }
 
 
