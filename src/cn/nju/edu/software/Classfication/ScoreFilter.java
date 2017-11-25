@@ -26,7 +26,7 @@ public class ScoreFilter {
     }
 
     public List<Student> filter(int eId,int pId){
-        double mean =meanScore(eId,pId,15);
+        double mean =meanScore(eId,pId,50);
         return upMeanUserIds(eId,pId,mean);
     }
 
@@ -93,7 +93,7 @@ public class ScoreFilter {
                 Student student=new Student();
                 student.setStudentId(set.getInt("user_id"));
                 student.setQuestionId(pId);
-                student.setScore(set.getInt("score")*100);
+                student.setScore(set.getDouble("score")*100);
                 //System.out.println(" userId: "+set.getInt("user_id"));
                 //list.add(set.getInt("user_id"));
                 list.add(student);
