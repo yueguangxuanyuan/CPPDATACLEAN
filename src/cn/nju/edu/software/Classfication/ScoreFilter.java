@@ -19,14 +19,14 @@ public class ScoreFilter {
     public static void main(String args[]){
         ScoreFilter filter=new ScoreFilter();
       // System.out.println("均分 :"+ filter.meanScore(2,2,15));
-       List<Student> list=filter.upMeanUserIds(2,2,100);
+       List<Student> list=filter.filter(46,102);
        for(Student student:list){
            System.out.println(student.toString());
        }
     }
 
     public List<Student> filter(int eId,int pId){
-        double mean =meanScore(eId,pId,15);
+        double mean =meanScore(eId,pId,80);
         return upMeanUserIds(eId,pId,mean);
     }
 
@@ -38,11 +38,11 @@ public class ScoreFilter {
         ResultSet set=null;
         PreparedStatement prepar=null;
         try {
-            prepar=connection.prepareStatement("select max(score) as score from exams_score where" +
-                    " exam_id=? and question_id=? group by exam_id,user_id");
+            prepar=connection.prepareStatement("select max(score) as score from studentquestionresult where" +
+                    " question_id=? group by student_id_id");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
-            prepar.setInt(1,eId);
-            prepar.setInt(2,pId);
+          //  prepar.setInt(1,eId);
+            prepar.setInt(1,pId);
             set=prepar.executeQuery();
             while(set.next()) {
                 list.add(set.getDouble("score")*100);
@@ -76,25 +76,27 @@ public class ScoreFilter {
     }
 
     public List<Student> upMeanUserIds(int eId,int pId,double score){
+
         List<Student> list=new ArrayList<>();
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.MYSQLBASE);
         ResultSet set=null;
         PreparedStatement prepar=null;
         score=score/100;//数据库中的每题的满分都是100
+        System.out.println("----------------------------score: "+score);
         try {
-            prepar=connection.prepareStatement("select DISTINCT user_id,max(score) as score from exams_score where" +
-                    " exam_id=? and question_id=? group by exam_id,user_id having max(score)>=?");
+            prepar=connection.prepareStatement("select  student_id_id as user_id,score  from studentquestionresult where" +
+                    "  question_id=? and score > ?");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
-            prepar.setInt(1,eId);
-            prepar.setInt(2,pId);
-            prepar.setDouble(3,score);
+           // prepar.setInt(1,eId);
+            prepar.setInt(1,pId);
+            prepar.setDouble(2,score);
             set=prepar.executeQuery();
             while(set.next()) {
                 Student student=new Student();
                 student.setStudentId(set.getInt("user_id"));
                 student.setQuestionId(pId);
-                student.setScore(set.getInt("score")*100);
-                //System.out.println(" userId: "+set.getInt("user_id"));
+                student.setScore(set.getDouble("score")*100);
+                System.out.println(" userId: "+set.getInt("user_id")+"   score:");
                 //list.add(set.getInt("user_id"));
                 list.add(student);
             }

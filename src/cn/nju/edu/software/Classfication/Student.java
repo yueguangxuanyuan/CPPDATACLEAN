@@ -6,7 +6,7 @@ package cn.nju.edu.software.Classfication;
 public class Student {
     private int questionId;
     private int studentId;
-    private int score;
+    private double score;
     private int codeTime;
     private int debugTime;
     private int sumTime;
@@ -30,11 +30,11 @@ public class Student {
         this.studentId = studentId;
     }
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 

@@ -21,8 +21,8 @@ public class ExerciseTimeFilter {
     public static void main(String arg[]){
         ExerciseTimeFilter filter=new ExerciseTimeFilter();
         ScoreFilter scoreFilter=new ScoreFilter();
-        List<Student> list=scoreFilter.filter(2,2);
-        list=filter.filter(2,2,"CODING",list);
+        List<Student> list=scoreFilter.filter(46,102);
+        list=filter.filter(46,102,"DEBUG",list);
 
         for(Student student:list){
             System.out.println(student.toString());
@@ -74,7 +74,7 @@ public class ExerciseTimeFilter {
         try {
             prepar=connection.prepareStatement("select sum(code_time) as code_time,sum(debug_time) " +
                     "as debug_time  from codeanddebugtime where" +
-                    " question_id_id=? group by student_id_id,question_id_id");
+                    " question_id=? group by student_id_id,question_id");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             prepar.setInt(1,pId);
            // prepar.setInt(2,pId);
@@ -131,10 +131,10 @@ public class ExerciseTimeFilter {
         ResultSet set=null;
         PreparedStatement prepar=null;
         try {
-            prepar=connection.prepareStatement("select student_id_id as studentId,question_id_id as questionId," +
+            prepar=connection.prepareStatement("select student_id_id as studentId,question_id as questionId," +
                     "sum(code_time) as code_time," +
                     "sum(debug_time) as debug_time  from codeanddebugtime where" +
-                    " question_id_id=? group by student_id_id,question_id_id");
+                    " question_id=? group by student_id_id,question_id");
 
             prepar.setInt(1,qId);
             // prepar.setInt(2,pId);
