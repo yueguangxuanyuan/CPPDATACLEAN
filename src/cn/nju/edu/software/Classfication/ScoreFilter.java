@@ -71,7 +71,7 @@ public class ScoreFilter {
         }else {
             mean=sum/lastNum;
         }
-
+        System.out.println(mean);
         return mean;
     }
 

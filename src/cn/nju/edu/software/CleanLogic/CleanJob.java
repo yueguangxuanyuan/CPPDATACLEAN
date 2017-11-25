@@ -39,11 +39,13 @@ public class CleanJob {
             System.out.println("start std:"+user_id);
             //解析log的path
             String[] logPList = _logP.split("/");
-            String logP = ConstantConfig.LOGPATH+logPList[3]+"\\"+logPList[4]+"\\"+logPList[5];
+            //String logP = ConstantConfig.LOGPATH+logPList[3]+"\\"+logPList[4]+"\\"+logPList[5];
+            String logP = ConstantConfig.LOGPATH+logPList[5];
 
             //解析monitor的path
             String[] monitorPList = _monitorP.split("/");
-            String monitorP = ConstantConfig.MONITORPATH+monitorPList[3]+"\\"+monitorPList[4]+"\\"+monitorPList[5];
+            //String monitorP = ConstantConfig.MONITORPATH+monitorPList[3]+"\\"+monitorPList[4]+"\\"+monitorPList[5];
+            String monitorP = ConstantConfig.MONITORPATH+monitorPList[5];
 
             //解压log压缩包和monitor压缩包
             File logFile = new File(logP);
