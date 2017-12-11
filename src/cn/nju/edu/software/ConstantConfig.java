@@ -8,7 +8,7 @@ public class ConstantConfig {
     public static String MYSQLBASE = "cpp_test_server";//server的数据库
     public static String MYSQLVISUA = "exam_1";//server的数据库
     public static String MYSQLUSERNAME = "root";
-    public static String MYSQLPASSWORD = "";
+    public static String MYSQLPASSWORD = "xuanyuan";
     public static String CLEANBASE = "cpp";//清洗完的数据存的数据库
     public static String LOGPATH = "D:\\CPP日志\\log-exam1\\";//log文件存放的路径
     public static String MONITORPATH = "D:\\CPP日志\\monitor-exam1\\";//monitor文件存放的路径
@@ -18,4 +18,6 @@ public class ConstantConfig {
     public static String[] TABLELIST = {"build_info","build_project_info","command_text","command_file","debug_info",
             "breakpoint","solution_open_event","file_event"};
     //public static String[] TABLELIST= {"breakpoint"};
+
+    public static String OUTPUT_LOG_ROOT_PATH = "E:\\CPP日志";
 }

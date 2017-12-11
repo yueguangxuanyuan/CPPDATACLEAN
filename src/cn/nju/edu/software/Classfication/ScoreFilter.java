@@ -29,7 +29,7 @@ public class ScoreFilter {
         double mean =meanScore(eId,pId,50);
         return upMeanUserIds(eId,pId,mean);
     }
-
+//查询成绩最好的N个人的平均值
     public double meanScore(int eId,int pId,int lastNum){
         double mean=0;
         List<Double> list=new ArrayList<>();
@@ -74,7 +74,7 @@ public class ScoreFilter {
         System.out.println(mean);
         return mean;
     }
-
+//过滤出高于平均分的N个人
     public List<Student> upMeanUserIds(int eId,int pId,double score){
         List<Student> list=new ArrayList<>();
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.MYSQLBASE);
