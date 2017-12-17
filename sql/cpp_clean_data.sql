@@ -92,7 +92,7 @@ create table test(
 	PRIMARY Key(id)
 );
 
-drop table if EXISTS varible;
+drop table if EXISTS variable;
 create table variable(
 	id int(10) not null AUTO_INCREMENT COMMENT 'id主键',
 	sid int(10) not null COMMENT '学生的id',
@@ -102,3 +102,28 @@ create table variable(
 	count int(10) default '0' COMMENT '变量出现的次数',
 	PRIMARY Key(id)
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='使用的变量名称的统计';
+
+drop table if exists code_line;
+create table code_line(
+	id int(10) not null AUTO_INCREMENT COMMENT 'id主键',
+	sid int(10) not null COMMENT '学生的id',
+	eid int (10) not null COMMENT '考试id',
+	pid int (10) not null COMMENT '题目id',
+	num int(10) default '0' COMMENT '代码行数',
+	PRIMARY Key(id)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='使用的变量名称的统计';
+
+
+
+drop table if exists copy;
+create table copy(
+	id int(10) not null AUTO_INCREMENT COMMENT 'id主键',
+	sid int(10) not null COMMENT '学生的id',
+	student_id varchar(255) COMMENT '学号',
+	eid int (10) not null COMMENT '考试id',
+	pid int (10) not null COMMENT '题目id',
+	longCopy int(10) default '0' COMMENT '拷贝数',
+	externalCopy int(10) default '0' COMMENT '拷贝数',
+	PRIMARY Key(id)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='拷贝的统计';
+

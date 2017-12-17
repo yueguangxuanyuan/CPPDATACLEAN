@@ -11,7 +11,7 @@ import java.util.zip.ZipInputStream;
  * Created by zr on 2017/11/14.
  */
 public class ZipUtil {
-    public  List<File> unzipFile(File zipFile, String descDir) {
+    public static List<File> unzipFile(File zipFile, String descDir) {
         List<File> res = new ArrayList<>();
         try{
                  ZipFile zf = new ZipFile(zipFile);
@@ -19,7 +19,6 @@ public class ZipUtil {
             ZipEntry entry = null;
             while((entry=zis.getNextEntry())!=null){
                 File outFile = new File(descDir+entry.getName());
-
                 if(!outFile.exists()){
                     outFile.createNewFile();
                 }
