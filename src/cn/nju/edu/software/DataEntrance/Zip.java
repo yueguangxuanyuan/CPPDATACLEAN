@@ -1,7 +1,12 @@
 package cn.nju.edu.software.DataEntrance;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -25,11 +30,14 @@ public class Zip {
             ZipEntry entry;
             try {
                 while((entry = zIn.getNextEntry())!=null && !entry.isDirectory()){
+                    System.out.println("-------");
                     fOut=new File(Parent,entry.getName());
                     if(!fOut.exists()){
                         (new File(fOut.getParent())).mkdirs();
                     }
                     fileSourcePath=entry.getName();
+
+                    System.out.println(" fileSourcePath: "+fileSourcePath);
                    // System.out.println("   entry.getName() "+entry.getName());
                     FileOutputStream out=new FileOutputStream(fOut);
                     BufferedOutputStream Bout=new BufferedOutputStream(out);
@@ -39,7 +47,7 @@ public class Zip {
                     }
                     Bout.close();
                     out.close();
-                    //System.out.println(fOut+"解压成功");
+                    System.out.println(fOut+"解压成功");
                 }
                 bIn.close();
                 zIn.close();
@@ -69,4 +77,50 @@ public class Zip {
             return false;
         }
     }
+
+    @SuppressWarnings("rawtypes")
+    public static  List<String> unZipFiles(File zipFile, String descDir) throws IOException {
+        List<String> outPathList=new ArrayList<>();
+
+        ZipFile zip = new ZipFile(zipFile, Charset.forName("GBK"));//解决中文文件夹乱码
+        String name = zip.getName().substring(zip.getName().lastIndexOf('\\')+1, zip.getName().lastIndexOf('.'));
+
+        File pathFile = new File(descDir+name);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+
+        for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+            ZipEntry entry = (ZipEntry) entries.nextElement();
+            String zipEntryName = entry.getName();
+            InputStream in = zip.getInputStream(entry);
+            String outPath = (descDir + name +"/"+ zipEntryName).replaceAll("\\*", "/");
+
+            // 判断路径是否存在,不存在则创建文件路径
+            File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            // 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
+            if (new File(outPath).isDirectory()) {
+                continue;
+            }
+            // 输出文件路径信息
+//          System.out.println(outPath);
+
+            FileOutputStream out = new FileOutputStream(outPath);
+           // System.out.println(" out path:"+outPath);
+            outPathList.add(outPath);
+            byte[] buf1 = new byte[1024];
+            int len;
+            while ((len = in.read(buf1)) > 0) {
+                out.write(buf1, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+        System.out.println("******************解压完毕********************");
+        return outPathList;
+    }
+
 }

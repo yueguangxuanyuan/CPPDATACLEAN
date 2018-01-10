@@ -29,7 +29,7 @@ public class CleanJob {
         }
     }
     public void anayzeCommit(List<CommitModel> commitList,int e_id){
-
+        //int i=0;
         for(CommitModel c:commitList){
             String _logP = c.getLog();
             String _monitorP = c.getMonitor();
@@ -46,6 +46,7 @@ public class CleanJob {
             String[] monitorPList = _monitorP.split("/");
             //String monitorP = ConstantConfig.MONITORPATH+monitorPList[3]+"\\"+monitorPList[4]+"\\"+monitorPList[5];
             String monitorP = ConstantConfig.MONITORPATH+monitorPList[5];
+                //System.out.println("logPath: " +logP+ "  monitorPath:"+monitorP);
 
             //解压log压缩包和monitor压缩包
             File logFile = new File(logP);
@@ -53,6 +54,10 @@ public class CleanJob {
 
             String log_unzip_path = logP.replace(".zip","")+"\\";
             String monitor_unzip_path = monitorP.replace(".zip","")+"\\";
+//            if(i==0){
+//                System.out.println("结束：");
+//                break;
+//            }
             //System.out.println(log_unzip_path);
             //System.out.println(monitor_unzip_path);
             try {

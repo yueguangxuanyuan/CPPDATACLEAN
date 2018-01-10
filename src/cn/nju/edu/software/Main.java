@@ -1,23 +1,18 @@
 package cn.nju.edu.software;
 
-import cn.nju.edu.software.Classfication.Fileter;
-import cn.nju.edu.software.Classfication.Student;
 import cn.nju.edu.software.CleanLogic.CleanJob;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.util.List;
-import java.util.Map;
+import cn.nju.edu.software.DataEntrance.DataUtil;
 
 public class Main {
 
     public static void main(String[] args) {
-//        CleanJob c = new CleanJob();
-//        int[] eid = {46};
-//        c.doClean(eid);
-//        DataUtil d = new DataUtil();
-//        d.cleanTempDatabase();
-        Fileter f = new Fileter();
+        CleanJob c = new CleanJob();
+        int[] eid = {67,68};
+        DataUtil d = new DataUtil();
+        d.cleanTempDatabase();
+        c.doClean(eid);
+
+//        Fileter f = new Fileter();
 //        int[] qid1 = {2,10,63,9,64,65,66,67,68,69,70,13,71,72,73};
 //        int[] qid2 = {75,76,77,85,86,87,88,89,90,91};
 //        for(int i:qid2) {
@@ -41,9 +36,11 @@ public class Main {
 //                e.printStackTrace();
 //            }
 //        }
+
+        /*
         Map<Integer,List<Student>> m =f.filter(46,102,"SUM",40);
         List<Student> l1 = m.get(1);
-        List<Student> l2 = m.get(2);
+        List<Student> l2 = m.get(2);*/
         try {
 //            FileWriter fw = new FileWriter("D:\\CPP日志\\Q102.txt");
 //            for (Student s : l1) {

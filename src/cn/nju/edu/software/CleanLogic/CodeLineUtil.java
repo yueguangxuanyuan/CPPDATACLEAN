@@ -20,7 +20,7 @@ public class CodeLineUtil {
     public static final String codeBasePath="D:\\cpp-log2\\07\\";
     public static final String outPath="D:\\cpp-log2\\unZipFile\\";
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws IOException {
         CodeLineUtil codeLineUtil=new CodeLineUtil();
         //codeLineUtil.calCodeLine();
         //codeLineUtil.statCodeLines("D:\\cpp-log2\\53_project_ZxBj3Zf\\Q103\\Source Files\\Source.cpp");
@@ -32,13 +32,17 @@ public class CodeLineUtil {
 //            i++;
 //        }
         codeLineUtil.cal(lineModels);
+        //String codeSourcePath=Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile\\");
+      //  Zip.unZipFiles(new File("D:\\cpp-log2\\53_project_ZxBj3Zf.zip"),"D:\\cpp-log2\\unZipFile\\");
+       // System.out.println("21: "+codeSourcePath);
     }
 
     public  void calCodeLine(){
 
-        Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile");
+       // Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile");
        // String descPath=  zipPath.replace(".zip","")+"//";
       //  unZip(zipFile,descPath);
+        String codeSourcePath=Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile");
     }
 
    public void cal(List<CodeLineModel> lineModels){
@@ -51,7 +55,17 @@ public class CodeLineUtil {
             String codeSourcePath=Zip.unZip(codeBasePath+zipName,outPath+zipName.substring(0,zipName.length()-4));
             String finalPath=outPath+zipName.substring(0,zipName.length()-4)+"\\"+codeSourcePath;
 
-            int line=statCodeLines(finalPath);
+            List<String> filePaths=new ArrayList<>();
+
+            try {
+              filePaths= Zip.unZipFiles(new File(codeBasePath+zipName),"D:\\cpp-log2\\unZipFile\\");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            int line=0;
+            for(String p:filePaths){
+                line=line+statCodeLines(p);
+            }
             model.setNum(line);
           model.setPid(102);//第二次考试的试题ID为102
             //insertCodeLine(list);
