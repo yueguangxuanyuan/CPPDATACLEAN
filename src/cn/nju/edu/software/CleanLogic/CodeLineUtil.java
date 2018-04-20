@@ -17,8 +17,8 @@ import java.util.List;
  * Created by zuce wei on 2017/12/17.
  */
 public class CodeLineUtil {
-    public static final String codeBasePath="D:\\cpp-log2\\07\\";
-    public static final String outPath="D:\\cpp-log2\\unZipFile\\";
+    public static final String codeBasePath="D:\\cpp-log3\\21\\";
+    public static final String outPath="D:\\cpp-log3\\unZipFile\\";
 
     public static void main(String args[]) throws IOException {
         CodeLineUtil codeLineUtil=new CodeLineUtil();
@@ -42,7 +42,7 @@ public class CodeLineUtil {
        // Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile");
        // String descPath=  zipPath.replace(".zip","")+"//";
       //  unZip(zipFile,descPath);
-        String codeSourcePath=Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip","D:\\cpp-log2\\unZipFile");
+        String codeSourcePath=Zip.unZip("D:\\cpp-log2\\53_project_ZxBj3Zf.zip",outPath);
     }
 
    public void cal(List<CodeLineModel> lineModels){
@@ -58,7 +58,7 @@ public class CodeLineUtil {
             List<String> filePaths=new ArrayList<>();
 
             try {
-              filePaths= Zip.unZipFiles(new File(codeBasePath+zipName),"D:\\cpp-log2\\unZipFile\\");
+              filePaths= Zip.unZipFiles(new File(codeBasePath+zipName),outPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,7 +111,7 @@ public class CodeLineUtil {
         try {
             prepar=connection.prepareStatement("select e1.* from exams_examprojects e1 where \n" +
                     "e1.id in( select max(e2.id) from exams_examprojects  e2\n" +
-                    "where e2.exam_id in ('52','53')  \n" +
+                    "where e2.exam_id in ('67','68')  \n" +
                     "group by e2.user_id,e2.exam_id) order by user_id;");
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();

@@ -241,7 +241,7 @@ public class DataUtil {
     //获取服务器数据库的提交记录
     public List<CommitModel> getCommitHistory(int exam_id){
         List<CommitModel> res = new ArrayList<>();
-        String sql = "SELECT * FROM dump.exams_examprojects where exam_id = ? and has_monitor = 1 order by user_id;";
+        String sql = "SELECT * FROM dump.exams_examprojects where exam_id = ? and has_monitor = 1 and user_id>435 order by user_id;";
         PreparedStatement s = null;
         Connection c = DaoUtil.getMySqlConnection(ConstantConfig.MYSQLBASE);
         if(c!=null){
