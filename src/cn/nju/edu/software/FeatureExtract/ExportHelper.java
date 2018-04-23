@@ -9,8 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExportHelper{
+    public static <StudentModel>  boolean exportToFile(Class modelClass, List<StudentModel> studentInfos,String rootPath,int qid, String tag){
+        String fileName = rootPath + File.separator + qid+"-"+tag;
+        return exportToFile(modelClass,fileName,studentInfos);
+    }
 
-    public static <StudentModel>  boolean exportToFile(Class modelClass,String fileName, List<StudentModel> studentInfos){
+    private static <StudentModel>  boolean exportToFile(Class modelClass,String fileName, List<StudentModel> studentInfos){
         File file = new File(fileName);
         if(!file.exists()){
             try {

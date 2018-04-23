@@ -2,7 +2,6 @@ package cn.nju.edu.software.FeatureExtract;
 
 import cn.nju.edu.software.Common.StringHelper;
 import cn.nju.edu.software.Common.UserSet.UserSetHelper;
-import cn.nju.edu.software.ConstantConfig;
 
 import java.io.*;
 import java.util.*;
@@ -146,8 +145,56 @@ public class ExtractUtil {
         return true;
     }
 
+    private static String getPackageNamefromStaticClass() {
+        String packageName = new Object() {
+            public String getClassName() {
+                String className = this.getClass().getName();
+                return className.substring(0, className.lastIndexOf("."));
+            }
+        }.getClassName();
+        return packageName;
+    }
+
+    /*
+    modules 指定需要抽取的特征模块
+     */
+    public static boolean extractFeature(int[] eIds,int qId,String[] modules){
+        List<String> failModules = new ArrayList<>();
+        ClassLoader classLoader =   ClassLoader.getSystemClassLoader();
+        String packageName = getPackageNamefromStaticClass();
+        String impPackageName = packageName+".Imp";
+        for(String moduleName : modules){
+            boolean isFail = true;
+            try {
+                String className = impPackageName +"." + FeatureConst.EXTRACT_FUNCTION_PREFIX+moduleName;
+                Class targetClass = classLoader.loadClass(className);
+                ACExtract acExtract = (ACExtract) targetClass.newInstance();
+                acExtract.extractToFile(FeatureConst.OUTPUT_ROOT,eIds,qId);
+                isFail = false;
+            } catch (ClassNotFoundException e) {
+                System.out.println("--module["+moduleName+"]不存在");
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                System.out.println("--module["+moduleName+"]实例化失败");
+            }
+            System.out.println("++module["+moduleName+"]  end++");
+            if(isFail){
+                failModules.add(moduleName);
+            }
+        }
+        if(failModules.size() > 0) {
+            System.out.println("failed modules-"+ Arrays.toString(failModules.toArray(new String[0])));
+        }
+        return failModules.size() < 1;
+    }
+
+
     public static void main(String[] args){
-        List<String> studentIds = UserSetHelper.getStudentIdListOfAnExam(46);
-        System.out.println(ExtractUtil.concatFeature(studentIds,"E:\\CPP日志\\extract","102"));
+        List<String> studentIds = UserSetHelper.getStudentIdListOfAnExam(new int[]{52,53});
+        System.out.println(ExtractUtil.concatFeature(studentIds,"E:\\CPP日志\\extract","103"));
+
+        //extractFeature(new int[]{52,53},103,new String[]{"Time","Build","Debug","Score","Edit"});
+
     }
 }

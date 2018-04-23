@@ -1,5 +1,7 @@
 package cn.nju.edu.software.Common;
 
+import java.util.Arrays;
+
 public class StringHelper {
     public static int countSubString(String str,String substr)
     {
@@ -15,5 +17,21 @@ public class StringHelper {
             count++;
         }
         return count;
+    }
+
+    public static String arrayToStringWithSmall(int[] data){
+        String cacheString = Arrays.toString(data);
+        cacheString = cacheString.substring(1,cacheString.length()-1);
+        return "("+cacheString+")";
+    }
+
+    public static <T> String arrayToStringWithSmall(T[] data){
+        String cacheString = Arrays.toString(data);
+        cacheString = cacheString.substring(1,cacheString.length()-1);
+        return "("+cacheString+")";
+    }
+
+    public static void main(String[] args){
+        System.out.println(arrayToStringWithSmall(new Integer[]{1,2,3}));
     }
 }

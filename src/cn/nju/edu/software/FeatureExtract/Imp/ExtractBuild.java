@@ -16,32 +16,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ExtractDebug extends ACExtract{
-    public class StudentDebugModel{
-        public StudentDebugModel(String studentId){
+public class ExtractBuild extends ACExtract{
+    public class StudentBuildModel{
+        public StudentBuildModel(String studentId){
             this.studentId = studentId;
         }
         public String studentId;
-        public int debugCount;
+        public int compileSuccessCount;
+        public int compileFailCount;
     }
 
-    public void getDebugCount(Map<String,StudentDebugModel> studentDebugModelMap,int qId,int[] eIds){
+    /*
+    目前由于一场考试只有一条题目 暂时不考虑 多项目的问题
+     */
+    public void getCompileCountInfo(Map<String,StudentBuildModel> studentBuildModelMap,int qId,int[] eIds){
         Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
         PreparedStatement prepar=null;
         try {
-            String sql = "SELECT sid,count(*) as debug_count FROM debug where eid in ${eids} group by sid;";
+            String sql = "SELECT sid,sum(case result when 'SUCCESS' then 1 else 0 end) as success,sum(case result when 'SUCCESS' then 0 else 1 end) as fail FROM build where eid in ${eids} group by sid;";
             sql = sql.replaceAll("\\$\\{eids}", StringHelper.arrayToStringWithSmall(eIds));
             prepar=connection.prepareStatement(sql);
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
             set=prepar.executeQuery();
+
             Map<Integer,String> userStudentMap = UserSetHelper.getUserSutdentMap(eIds);
             while(set.next()) {
                 int sid = set.getInt("sid");
                 String studentId = userStudentMap.get(sid);
-                StudentDebugModel studentDebugModel = studentDebugModelMap.get(studentId);
-                if(studentDebugModel != null){
-                    studentDebugModel.debugCount = set.getInt("debug_count");
+                StudentBuildModel studentBuildModel = studentBuildModelMap.get(studentId);
+                if(studentBuildModel != null){
+                    studentBuildModel.compileFailCount = set.getInt("fail");
+                    studentBuildModel.compileSuccessCount = set.getInt("success");
                 }else{
                     //出现异常
                     System.out.println(getTagName()+"-学生id缺失-"+studentId);
@@ -54,20 +60,21 @@ public class ExtractDebug extends ACExtract{
             DaoUtil.closeConnection(connection,prepar,set);
         }
     }
-    @Override
-    public boolean extractToFile(String rootFolderPath, int[] eids,int qid) {
-        List<String> studentIds = UserSetHelper.getStudentIdListOfAnExam(eids);
-        TreeMap<String,StudentDebugModel> studentDebugModelTreeMap = new TreeMap<>();
-        for(String studentid : studentIds){
-            studentDebugModelTreeMap.put(studentid,new StudentDebugModel(studentid));
-        }
-        getDebugCount(studentDebugModelTreeMap,qid,eids);
 
-        List<StudentDebugModel> studentDebugModels = new ArrayList<>(studentDebugModelTreeMap.values());
-        return ExportHelper.exportToFile(StudentDebugModel.class,studentDebugModels,rootFolderPath,qid,getTagName());
+    @Override
+    public boolean extractToFile(String rootFolderPath, int[] eids, int qid) {
+        List<String> studentIds = UserSetHelper.getStudentIdListOfAnExam(eids);
+        TreeMap<String,StudentBuildModel> studentBuildModelTreeMap = new TreeMap<>();
+        for(String studentid : studentIds){
+            studentBuildModelTreeMap.put(studentid,new StudentBuildModel(studentid));
+        }
+        getCompileCountInfo(studentBuildModelTreeMap,qid,eids);
+
+        List<StudentBuildModel> studentBuildModels = new ArrayList<>(studentBuildModelTreeMap.values());
+        return ExportHelper.exportToFile(StudentBuildModel.class,studentBuildModels,rootFolderPath,qid,getTagName());
     }
 
     public static void main(String[] args){
-        System.out.println(new ExtractDebug().extractToFile("E:\\CPP日志\\extract",new int[]{52,53},103));
+        System.out.println(new ExtractBuild().extractToFile("E:\\CPP日志\\extract",new int[]{52,53},103));
     }
 }

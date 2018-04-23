@@ -9,7 +9,7 @@ public class ConstantConfig {
     public static String MYSQLVISUA = "exam_1";//server的数据库
     public static String MYSQLUSERNAME = "root";
     public static String MYSQLPASSWORD = "xuanyuan";
-    public static String CLEANBASE = "cpp";//清洗完的数据存的数据库
+    public static String CLEANBASE = "cpp_test3";//清洗完的数据存的数据库
     public static String LOGPATH = "D:\\CPP日志\\log-exam1\\";//log文件存放的路径
     public static String MONITORPATH = "D:\\CPP日志\\monitor-exam1\\";//monitor文件存放的路径
     public static String LOGUNZIPPATH = "";//log文件解压路径

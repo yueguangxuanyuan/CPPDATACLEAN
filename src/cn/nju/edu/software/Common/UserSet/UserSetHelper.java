@@ -1,34 +1,49 @@
 package cn.nju.edu.software.Common.UserSet;
 
-import cn.nju.edu.software.Classfication.UserStudentMap;
+import cn.nju.edu.software.Common.StringHelper;
 import cn.nju.edu.software.ConstantConfig;
 import cn.nju.edu.software.SqlHelp.DaoUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 
 public class UserSetHelper {
-    /*
-    返回User_id
-     */
-    public static List<Integer> getStudentListOfAnExam(int eId){
-        List<Integer> userIds = new ArrayList<>();
+    private static Object lock = new Object();
 
-        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.MYSQLBASE);
+    private static  Set<Integer> recordedEaxms = new HashSet<>();
+    public static Map<Integer,String> userStudentMap = new HashMap<>();
+
+    private static void loadData(int[] eIds){
+         boolean isSame = true;
+         if(eIds.length == recordedEaxms.size()){
+             for(Integer id : eIds){
+                 if(!recordedEaxms.contains(id)){
+                     isSame = false;
+                     break;
+                 }
+             }
+         }else{
+             isSame = false;
+         }
+
+         if(isSame){
+             return;
+         }
+
+         recordedEaxms.clear();
+         userStudentMap.clear();
+
+        Connection connection= DaoUtil.getMySqlConnection(ConstantConfig.CLEANBASE);
         ResultSet set=null;
         PreparedStatement prepar=null;
         try {
-            prepar=connection.prepareStatement("select distinct user_id from exams_score where exam_id = ? order by user_id asc");
+            String sql = "select distinct sid,student_id from studentinexam where exam_id in ${eids} order by sid asc";
+            sql = sql.replaceAll("\\$\\{eids}",StringHelper.arrayToStringWithSmall(eIds));
+            prepar=connection.prepareStatement(sql);
             //把sql语句发送到数据库，得到预编译类的对象，这句话是选择该student表里的所有数据
-            prepar.setInt(1,eId);
             set=prepar.executeQuery();
             while(set.next()) {
-                userIds.add(set.getInt("user_id"));
+                userStudentMap.put(set.getInt("sid"),set.getString("student_id"));
             }
             connection.close();
         } catch (SQLException e) {
@@ -36,25 +51,47 @@ public class UserSetHelper {
         }finally {
             DaoUtil.closeConnection(connection,prepar,set);
         }
-        return userIds;
+
+        for(Integer id : eIds){
+            recordedEaxms.add(id);
+        }
+        return;
+    }
+
+    public static Map<Integer,String> getUserSutdentMap(int[] eIds){
+        synchronized (lock){
+            loadData(eIds);
+            return new HashMap<>(userStudentMap);
+        }
+    }
+
+    /*
+    返回User_id
+     */
+    public static List<Integer> getStudentListOfAnExam(int[] eIds){
+        synchronized (lock){
+            loadData(eIds);
+            List<Integer> userIds = new ArrayList<>(userStudentMap.keySet());
+            return userIds;
+        }
     }
 
     /*
     返回 Student id
      */
-    public static List<String> getStudentIdListOfAnExam(int eid){
-        List<Integer> userIds = getStudentListOfAnExam(eid);
-
-        List<String> studentIds = new ArrayList<>(userIds.size());
-
-        if(userIds.size() > 0){
-            Map<Integer,String> userToStudentMap = UserStudentMap.userStudentMap();
-
-            for(int userId : userIds){
-                studentIds.add(userToStudentMap.get(userId));
-            }
+    public static List<String> getStudentIdListOfAnExam(int[] eIds){
+        synchronized (lock){
+            loadData(eIds);
+            List<String> studentIds = new ArrayList<>(userStudentMap.values());
+            return studentIds;
         }
+    }
 
-        return studentIds;
+    public static void main(String[] args) {
+//        System.out.println(getStudentIdListOfAnExam(new int[]{52,53}).size());
+        Map<Integer,String> theMap = UserSetHelper.getUserSutdentMap(new int[]{52});
+        System.out.println(theMap.size());
+        theMap.clear();
+        System.out.println(UserSetHelper.userStudentMap.size());
     }
 }

@@ -1,6 +1,5 @@
 package cn.nju.edu.software.FeatureExtract.Imp;
 
-import cn.nju.edu.software.Classfication.UserStudentMap;
 import cn.nju.edu.software.Common.ActionJudger.EditJudger;
 import cn.nju.edu.software.Common.UserSet.UserSetHelper;
 import cn.nju.edu.software.ConstantConfig;
@@ -10,11 +9,9 @@ import cn.nju.edu.software.Model.serverdb.TextInfoModel;
 import cn.nju.edu.software.SqlHelp.DaoUtil;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +30,18 @@ public class ExtractEdit extends ACExtract{
     /*
     初次在 102上运行  耗时  2小时45min
      */
-    public List<StudentPasteModel> statisticPaste(int qid,List<Integer> userids){
+    public List<StudentPasteModel> statisticPaste(int qid,List<Integer> userids,int[] eids){
         List<StudentPasteModel> pasteRecords = new ArrayList<>();
         List<TextInfoModel> textInfoModels;
-        Map<Integer,String> userStudentMap = UserStudentMap.userStudentMap();
+        Map<Integer,String> userStudentMap = UserSetHelper.getUserSutdentMap(eids);
+
+         /*
+        获取行号计算进度
+         */
+        int rowCount = userids.size();
+        //显示完成进度，设立target
+        int goal = 10;
+        float count = 0;
 
         for(int s_userid:userids){
             StudentPasteModel student = new StudentPasteModel();
@@ -69,7 +74,14 @@ public class ExtractEdit extends ACExtract{
                 pasteRecords.add(student);
             }else{
                 //认为当前流程是异常流程
-                System.out.println(getFileName() + "- paste统计 - 异常userid - "+s_userid);
+                System.out.println(getTagName() + "- paste统计 - 异常userid - "+s_userid);
+            }
+
+            count++;
+            if(count/rowCount*100 >= goal){
+                goal = new Float(count/rowCount*100).intValue();
+                System.out.println("已完成："+goal+"%");
+                goal+=10;
             }
         }
 
@@ -91,6 +103,7 @@ public class ExtractEdit extends ACExtract{
             prepar.setInt(2,sId);
             // prepar.setInt(2,pId);
             set=prepar.executeQuery();
+
             while(set.next()) {
                 TextInfoModel model=new TextInfoModel();
                 model.setType(set.getString("type"));
@@ -112,16 +125,15 @@ public class ExtractEdit extends ACExtract{
     }
 
     @Override
-    public boolean extractToFile(String rootFolderPath, int eid, int qid) {
-        List<Integer> attendedUserIds = UserSetHelper.getStudentListOfAnExam(eid);
-        List<StudentPasteModel> studentPasteInfos = statisticPaste(qid,attendedUserIds);
+    public boolean extractToFile(String rootFolderPath, int[] eids, int qid) {
+        List<Integer> attendedUserIds = UserSetHelper.getStudentListOfAnExam(eids);
+        List<StudentPasteModel> studentPasteInfos = statisticPaste(qid,attendedUserIds,eids);
 
-        String fileName = rootFolderPath + File.separator + qid+"-"+getFileName();
-        return ExportHelper.exportToFile(StudentPasteModel.class,fileName,studentPasteInfos);
+        return ExportHelper.exportToFile(StudentPasteModel.class,studentPasteInfos,rootFolderPath,qid,getTagName());
     }
 
 
     public static void main(String[] args){
-        System.out.println(new ExtractEdit().extractToFile("E:\\CPP日志\\extract",46,102));
+        System.out.println(new ExtractEdit().extractToFile("E:\\CPP日志\\extract",new int[]{52,53},103));
     }
 }
