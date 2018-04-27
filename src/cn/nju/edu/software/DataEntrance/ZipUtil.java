@@ -13,35 +13,35 @@ import java.util.zip.ZipInputStream;
 public class ZipUtil {
     public static List<File> unzipFile(File zipFile, String descDir) {
         List<File> res = new ArrayList<>();
-        try{
-                 ZipFile zf = new ZipFile(zipFile);
+        try {
+            ZipFile zf = new ZipFile(zipFile);
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry entry = null;
-            while((entry=zis.getNextEntry())!=null){
-                File outFile = new File(descDir+entry.getName());
-                if(!outFile.exists()){
+            while ((entry = zis.getNextEntry()) != null) {
+                File outFile = new File(descDir + entry.getName());
+                if (!outFile.exists()) {
                     outFile.createNewFile();
                 }
                 BufferedInputStream bis = new BufferedInputStream(zf.getInputStream(entry));
                 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outFile));
                 byte[] b = new byte[100];
-                while ( true )
-                {
-                    int len = bis.read ( b ) ;
-                    if ( len == - 1 )
-                        break ;
-                    bos.write ( b , 0 , len ) ;
+                while (true) {
+                    int len = bis.read(b);
+                    if (len == -1)
+                        break;
+                    bos.write(b, 0, len);
                 }
-                            // close stream
-                bis.close ( ) ;
-                bos.close ( ) ;
+                // close stream
+                bis.close();
+                bos.close();
                 res.add(outFile);
             }
-            }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            }
-            return res;
         }
+        return res;
+    }
+
     public  List<File> unzipLogdbFile(File zipFile, String descDir) {
         List<File> res = new ArrayList<>();
         try{

@@ -2,8 +2,10 @@ package cn.nju.edu.software.SqlHelp;
 
 
 import cn.nju.edu.software.ConstantConfig;
-import java.sql.*;
+import cn.nju.edu.software.Util.FileUtil;
 
+import java.sql.*;
+import java.util.HashMap;
 
 
 /**
@@ -103,5 +105,46 @@ public class DaoUtil {
                 e.printStackTrace();
             }
 
+    }
+    /*
+    方法要求脚本文件满足 所有语句用;分割，并且不存在注释
+     */
+    public static void ExecuteSQLScript(String inDBName, String inScriptPath, HashMap<String,String> scriptParams){
+        String theScript  = FileUtil.GetFileContent(inScriptPath);
+
+        if(scriptParams != null){
+            for(String key : scriptParams.keySet()){
+                String regexPattern = "\\$\\{"+key+"\\}";
+                theScript = theScript.replaceAll(regexPattern,scriptParams.get(key));
+            }
+        }
+
+        Connection c = DaoUtil.getMySqlConnection("");
+        Statement statement = null;
+        try {
+            statement = c.createStatement();
+
+            String[] sqlScripts = theScript.split(";");
+            for(String sql : sqlScripts){
+                sql = sql.trim();
+                if(sql.isEmpty()){
+                   continue;
+                }
+                //遇到注释掉的语句
+                if(sql.startsWith("--")){
+                    continue;
+                }
+                statement.execute(sql);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                statement.close();
+                c.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

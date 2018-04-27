@@ -1,4 +1,4 @@
-use temp_logdb;
+use cleanDB_${mark};
 
 TRUNCATE TABLE build_info;
 TRUNCATE TABLE build_project_info;
