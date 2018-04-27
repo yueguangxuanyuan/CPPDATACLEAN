@@ -25,10 +25,7 @@ public class ConstantConfig {
     public static String LOG_UNZIPPATH = "E:\\server_data\\tmp\\log\\";//log文件解压路径
     public static String MONITOR_UNZIPPATH = "E:\\server_data\\tmp\\monitor\\";//monitor文件解压路径
 
-    public static String MYSQLPROCESS = "dump";//zzt预处理过的数据库
     public static String TEMPBASE = "temp_logdb";//临时的本地表
-
-
     /*
     数据库脚本文件路径
      */
@@ -41,9 +38,6 @@ public class ConstantConfig {
     /*
     一些神奇的常数
      */
-    public static  String STUDENT_ID_PATTERN = "^\\d+$";
-    public static  int[]  SPECIAL_USER_ID_LIST ={ 1,2,3,263,264,265,266,267,268,269,270,271,397,637,638,639,640,641};//一些管理员和测试账户
-
     public static String[] TABLELIST = {"build_info","build_project_info","command_text","command_file","solution_open_event","file_event","content_info"};
     public static String[] DEBUG_TABLELIST ={"breakpoint","exception","debug_info"};
  }
