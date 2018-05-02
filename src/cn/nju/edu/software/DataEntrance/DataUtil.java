@@ -351,7 +351,7 @@ public class DataUtil {
                 ps.setInt(1,user_id);
                 //读取数据
                 for (int i = needIdCol?0:1; i < columnCount; i++) {
-                    if(columnList.get(i).contains("time")){
+                    if(columnList.get(i).contains("time") &&  !columnList.get(i).equals("happentime")){
                         String timeStr = rs.getString(i+1);
                         timeStr = TimeUtil.timeFormat(timeStr);
                         ps.setString(i+baseOffset,timeStr);

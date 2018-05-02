@@ -66,7 +66,6 @@ public class CleanJob {
             String _logP = c.getLog();
             String _monitorP = c.getMonitor();
             int user_id = c.getUser_id();
-
             //一位同学的数据被清洗完毕
             if((c.getUser_id()!=current_id)&&(current_id!=-1)){
                 //从本地临时数据库进行数据分析，结果插入最终的数据库，七个模块
@@ -147,7 +146,7 @@ public class CleanJob {
             dataUtil.moveDataFromTempToPermanentDB(tableName,sid,true);
         }
 
-        dataUtil.moveDataFromTempToPermanentDB("test_result",sid,false);
+        dataUtil.moveDataFromTempToPermanentDB("test_result",sid,true);
         dataUtil.closeCon();
     }
 }
