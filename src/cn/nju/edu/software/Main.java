@@ -7,10 +7,10 @@ import cn.nju.edu.software.Common.LogCommon;
 import cn.nju.edu.software.DataEntrance.DataDao;
 import cn.nju.edu.software.DataEntrance.ZipDao;
 
+
 import java.time.LocalTime;
 
 public class Main {
-
     public static void main(String[] args) {
         LogCommon.getInstance().log(LocalTime.now().toString());
         int[] eid = {52,53};
