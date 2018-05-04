@@ -1,18 +1,22 @@
 package cn.nju.edu.software.CleanLogic;
 
+import cn.nju.edu.software.Common.ConstCommon;
 import cn.nju.edu.software.Common.ExamCommon;
-import cn.nju.edu.software.Common.LogCommon;
 import cn.nju.edu.software.ConstantConfig;
-import cn.nju.edu.software.DataEntrance.ZipUtil;
+import cn.nju.edu.software.DataEntrance.ZipDao;
 import cn.nju.edu.software.Model.CommitModel;
-import cn.nju.edu.software.DataEntrance.DataUtil;
-import cn.nju.edu.software.SqlHelp.DaoUtil;
+import cn.nju.edu.software.DataEntrance.DataDao;
+import cn.nju.edu.software.Util.CHZipUtils;
 import cn.nju.edu.software.Util.DirUtil;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.sql.Timestamp;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -20,8 +24,8 @@ import java.util.function.BiFunction;
  * Created by zr on 2017/11/14.
  */
 public class CleanJob {
-    DataUtil dataUtil = new DataUtil();
-    ZipUtil zipUtil = new ZipUtil();
+    DataDao dataUtil = new DataDao();
+    ZipDao zipUtil = new ZipDao();
     int current_id = -1;
 
     public  void doClean(int[] examid ){
@@ -70,11 +74,10 @@ public class CleanJob {
             if((c.getUser_id()!=current_id)&&(current_id!=-1)){
                 //从本地临时数据库进行数据分析，结果插入最终的数据库，七个模块
                 endClean(current_id);
-                //清空数据库
                 dataUtil.cleanTempDatabase();
                 endTime = LocalTime.now();
                 System.out.println("====student :"+current_id+" finish clean :"+getCleanTimeOfOneStudent.apply(startTime,endTime)+"====");
-//                return;
+                //return;
             }
             if(current_id != user_id){
                 current_id = user_id;
@@ -103,7 +106,9 @@ public class CleanJob {
 
             zipUtil.unzipFile(logFile,log_unzip_path);
             zipUtil.unzipLogdbFile(monitorFile,monitor_unzip_path);
+            CHZipUtils.unZip(monitorP,monitor_unzip_path,ExamCommon.getInstance().getCurrent_Exam_Date_Standard());
 
+            cleanBuildFileVersion(user_id);
             //插入数据库
             String logdb_path = ConstantConfig.MONITOR_UNZIPPATH+ "Dao\\log.db";
             if(new File(logdb_path).exists()){
@@ -133,6 +138,47 @@ public class CleanJob {
         dataUtil.cleanTempDatabase();
         endTime = LocalTime.now();
         System.out.println("====student :"+current_id+" finish clean :"+getCleanTimeOfOneStudent.apply(startTime,endTime)+"====");
+    }
+
+    /*
+    转移用户的Build版本
+     */
+    private void cleanBuildFileVersion(int sid){
+        final String monitor_unzip_path = ConstantConfig.MONITOR_UNZIPPATH;
+        String buildFolder_path = monitor_unzip_path+ "File"+File.separator+"build_files";
+        File buildfiles_root = new File(buildFolder_path);
+        if(!buildfiles_root.exists()){
+           return;
+        }
+
+        String targetFolder_path = ConstCommon.getInstance().getTargetFolderName() + File.separator +sid;
+        File target_root = new File(targetFolder_path);
+        if(!target_root.exists()){
+            target_root.mkdirs();
+        }
+
+        HashSet<String> existFolderNameSet = new HashSet<>();
+        existFolderNameSet.addAll(Arrays.asList(target_root.list()));
+
+        String current_Date_Standard = ExamCommon.getInstance().getCurrent_Exam_Date_Standard();
+        String[] fileNamesToMove = buildfiles_root.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith(current_Date_Standard) && !existFolderNameSet.contains(name);
+            }
+        });
+
+        for(String fileName : fileNamesToMove){
+            File sourceFolder = new File(buildFolder_path + File.separator + fileName);
+            File targetFolder = new File(targetFolder_path+File.separator+fileName);
+            targetFolder.mkdir();
+
+            try {
+                FileUtils.copyDirectory(sourceFolder,targetFolder);
+            } catch (IOException e) {
+                System.out.println("复制："+fileName+":失败");
+            }
+        }
     }
 
     //从临时数据库进行清洗的入口函数

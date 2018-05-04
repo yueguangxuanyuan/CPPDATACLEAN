@@ -18,7 +18,7 @@ public class ExamCommon {
     }
 
     private String current_Exam_Date = "";  //sql.db 采用的格式  2016/7/7
-    private String current_Exam_Date_Standard = "";//标准格式  2016/06/06
+    private String current_Exam_Date_Standard = "";//标准格式  2016-06-06
 
     public String getCurrent_Exam_Date_Standard() {
         return current_Exam_Date_Standard;

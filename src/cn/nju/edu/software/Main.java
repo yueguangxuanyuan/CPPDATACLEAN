@@ -1,9 +1,11 @@
 package cn.nju.edu.software;
 
 import cn.nju.edu.software.CleanLogic.CleanJob;
+import cn.nju.edu.software.Common.ConstCommon;
 import cn.nju.edu.software.Common.DBCommon;
 import cn.nju.edu.software.Common.LogCommon;
-import cn.nju.edu.software.DataEntrance.DataUtil;
+import cn.nju.edu.software.DataEntrance.DataDao;
+import cn.nju.edu.software.DataEntrance.ZipDao;
 
 import java.time.LocalTime;
 
@@ -12,13 +14,16 @@ public class Main {
     public static void main(String[] args) {
         LogCommon.getInstance().log(LocalTime.now().toString());
         int[] eid = {52,53};
-        String mark = "t3";
+        String mark = "t3_3";
 
         //初始化数据
         DBCommon.getInstance().setTargetDBName(mark);
-        DataUtil d = new DataUtil();
+        ConstCommon.getInstance().setTargetFolderName(mark);
+
+        DataDao d = new DataDao();
         d.initTempDatabase();
         d.initTargetDatabase(mark);
+        ZipDao.initBuildFileRootFolder();
 
         System.out.println("====程序初始化成功====");
         LogCommon.getInstance().log(LocalTime.now().toString());

@@ -1,5 +1,8 @@
 package cn.nju.edu.software.DataEntrance;
 
+import cn.nju.edu.software.Common.ConstCommon;
+import cn.nju.edu.software.Util.DirUtil;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +13,21 @@ import java.util.zip.ZipInputStream;
 /**
  * Created by zr on 2017/11/14.
  */
-public class ZipUtil {
+public class ZipDao {
+    public static void initBuildFileRootFolder(){
+        String rootPath = ConstCommon.getInstance().getTargetFolderName();
+        File buildRoot = new File(rootPath);
+        if(!buildRoot.exists()){
+            buildRoot.mkdirs();
+        }else if(buildRoot.isFile()){
+            DirUtil.EmptyDir(rootPath);
+            buildRoot.delete();
+            buildRoot.mkdirs();
+        }else {
+            DirUtil.EmptyDir(rootPath);
+        }
+    }
+
     public static List<File> unzipFile(File zipFile, String descDir) {
         List<File> res = new ArrayList<>();
         try {

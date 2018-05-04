@@ -12,9 +12,10 @@ public class ConstantConfig {
     public static String MYSQLUSERNAME = "root";
     public static String MYSQLPASSWORD = "xuanyuan";
 
-    public static String MYSQLVISUA = "exam_1";//server的数据库
     public static String CLEANBASE = "cpp_temp";//清洗完的数据存的数据库
     public static String ClEAN_TARGET_DB_PATTERN = "cleanDB_${mark}";
+
+    public static String ClEAN_TARGET_Folder_PATTERN = "E:\\server_data\\cleanBuild\\exam_${mark}";
     /*
     服务器日志文件存放位置
      */

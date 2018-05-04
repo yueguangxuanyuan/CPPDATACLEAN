@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 /**
  * Created by zr on 2017/11/14.
  */
-public class DataUtil {
+public class DataDao {
     Connection tempbaseCon = null;
     Connection mysqlbaseCon = null;
     Connection persistentDBCon = null;

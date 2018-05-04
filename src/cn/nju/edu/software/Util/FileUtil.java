@@ -1,6 +1,7 @@
 package cn.nju.edu.software.Util;
 
 import cn.nju.edu.software.ConstantConfig;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 
@@ -43,6 +44,11 @@ public class FileUtil {
     }
 
     public static void main(String[] args){
-        System.out.println(FileUtil.GetFileContent(ConstantConfig.TEMPDB_INIT_SQLFILE));
+//        System.out.println(FileUtil.GetFileContent(ConstantConfig.TEMPDB_INIT_SQLFILE));
+        try {
+            FileUtils.copyDirectory(new File("E:\\tmp\\111"),new File("E:\\tmp\\222"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
