@@ -13,8 +13,8 @@ import java.time.LocalTime;
 public class Main {
     public static void main(String[] args) {
         LogCommon.getInstance().log(LocalTime.now().toString());
-        int[] eid = {52,53};
-        String mark = "t3_3";
+        int[] eid = {72};
+        String mark = "final_1";
 
         //初始化数据
         DBCommon.getInstance().setTargetDBName(mark);

@@ -28,10 +28,10 @@ public class ZipDao {
         }
     }
 
-    public static List<File> unzipFile(File zipFile, String descDir) {
-        List<File> res = new ArrayList<>();
+    public static boolean unzipFile(File zipFile, String descDir) {
+        ZipFile zf = null;
         try {
-            ZipFile zf = new ZipFile(zipFile);
+            zf = new ZipFile(zipFile);
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry entry = null;
             while ((entry = zis.getNextEntry()) != null) {
@@ -51,18 +51,26 @@ public class ZipDao {
                 // close stream
                 bis.close();
                 bos.close();
-                res.add(outFile);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }finally {
+            if (zf != null) {
+                try {
+                    zf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return res;
+        return true;
     }
 
-    public  List<File> unzipLogdbFile(File zipFile, String descDir) {
-        List<File> res = new ArrayList<>();
+    public boolean unzipLogdbFile(File zipFile, String descDir) {
+        ZipFile zf = null;
         try{
-            ZipFile zf = new ZipFile(zipFile);
+            zf = new ZipFile(zipFile);
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry entry = null;
             while((entry=zis.getNextEntry())!=null){
@@ -86,12 +94,20 @@ public class ZipDao {
                     // close stream
                     bis.close();
                     bos.close();
-                    res.add(outFile);
                 }
             }
         }catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }finally {
+            if(zf != null){
+                try {
+                    zf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return res;
+        return true;
     }
 }

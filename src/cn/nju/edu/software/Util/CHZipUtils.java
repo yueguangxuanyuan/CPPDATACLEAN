@@ -118,7 +118,7 @@ public class CHZipUtils {
      * @param destDir 解压目录
      * pathIdentity 限制文件的路径 需要包含的关键字
      */
-    public static void unZip(String zipFilePath, String destDir,String pathIdentity) {
+    public static boolean unZip(String zipFilePath, String destDir,String pathIdentity) {
         ZipFile zipFile = null;  //需解压的压缩文件
         try {
             BufferedInputStream bis = null;
@@ -166,12 +166,16 @@ public class CHZipUtils {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }finally{
             try {
-                zipFile.close();
+                if(zipFile != null){
+                    zipFile.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        return true;
     }
 }

@@ -103,11 +103,23 @@ public class CleanJob {
             File logFile = new File(logP);
             File monitorFile = new File(monitorP);
 
-
-            zipUtil.unzipFile(logFile,log_unzip_path);
-            zipUtil.unzipLogdbFile(monitorFile,monitor_unzip_path);
-            CHZipUtils.unZip(monitorP,monitor_unzip_path,ExamCommon.getInstance().getCurrent_Exam_Date_Standard());
-
+            try {
+                boolean unzipResult = zipUtil.unzipFile(logFile, log_unzip_path);
+                if (!unzipResult) {
+                    throw new Exception("bad unzip");
+                }
+                unzipResult = zipUtil.unzipLogdbFile(monitorFile, monitor_unzip_path);
+                if (!unzipResult) {
+                    throw new Exception("bad unzip");
+                }
+                unzipResult = CHZipUtils.unZip(monitorP, monitor_unzip_path, ExamCommon.getInstance().getCurrent_Exam_Date_Standard());
+                if (!unzipResult) {
+                    throw new Exception("bad unzip");
+                }
+            }catch (Exception e){
+                System.out.println("user_id:"+c.getUser_id() + "-create_time:"+c.getCreate_time()+":unzipFail");
+                continue;
+            }
             cleanBuildFileVersion(user_id);
             //插入数据库
             String logdb_path = ConstantConfig.MONITOR_UNZIPPATH+ "Dao\\log.db";

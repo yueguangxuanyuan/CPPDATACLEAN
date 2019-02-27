@@ -88,7 +88,7 @@ public class DaoUtil {
         return c;
     }
 
-    public static void closeConnection(Connection connection,PreparedStatement prep,ResultSet set){
+    public static void closeConnection(Connection connection,Statement prep,ResultSet set){
 
             try {
                 if(connection!=null&&!connection.isClosed()){

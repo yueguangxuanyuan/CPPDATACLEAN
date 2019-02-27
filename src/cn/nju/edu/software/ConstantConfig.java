@@ -19,8 +19,8 @@ public class ConstantConfig {
     /*
     服务器日志文件存放位置
      */
-    public static String LOGPATH = "E:\\server_data\\log\\07\\";//log文件存放的路径
-    public static String MONITORPATH = "E:\\server_data\\project\\07\\";//monitor文件存放的路径
+    public static String LOGPATH = "E:\\server_data\\log\\12\\";//log文件存放的路径
+    public static String MONITORPATH = "E:\\server_data\\project\\12\\";//monitor文件存放的路径
 
     //数据库输出文件的
     public static String LOG_UNZIPPATH = "E:\\server_data\\tmp\\log\\";//log文件解压路径
