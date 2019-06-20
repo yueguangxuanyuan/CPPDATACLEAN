@@ -83,9 +83,10 @@ public class DataDao {
     }
 
     public void insertDataFromServerLog(String logFile, int e_id, int s_id){
+        BufferedReader br = null;
         try {
             FileReader fr = new FileReader(logFile);
-            BufferedReader br = new BufferedReader(fr);
+            br = new BufferedReader(fr);
             String line = null;
 
             String current_Exam_Date = ExamCommon.getInstance().getCurrent_Exam_Date_Standard();
@@ -169,6 +170,14 @@ public class DataDao {
             }
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            if (br != null){
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     //获取服务器数据库的提交记录
@@ -275,13 +284,20 @@ public class DataDao {
             tempbaseCon.setAutoCommit(true);
 
             ps.close();
-            s.close();
             rs.close();
-            sqlitec.close();
+            s.close();
 
         }catch (Exception e){
-
             e.printStackTrace();
+        }finally {
+            if(sqlitec != null){
+                try {
+                    sqlitec.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.gc();
+            }
         }
     }
 
@@ -501,6 +517,9 @@ public class DataDao {
                         });
                         vc_preparedStatement.addBatch();
                     }
+                    selectResult.close();
+                    selectStatement.close();
+
                     tmpDBCon.setAutoCommit(false);
                     vc_preparedStatement.executeBatch();
                     tmpDBCon.commit();
@@ -565,11 +584,21 @@ public class DataDao {
 
             rs.close();
             statement.close();
-            sqlitec.close();
+            insertStatement.close();
             tmpDBCon.close();
-        }catch (Exception e){
 
+
+        }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            if (sqlitec != null){
+                try {
+                    sqlitec.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.gc();
+            }
         }
     }
 }

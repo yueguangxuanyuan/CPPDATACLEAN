@@ -14,7 +14,8 @@ public class Main {
     public static void main(String[] args) {
         LogCommon.getInstance().log(LocalTime.now().toString());
         int[] eid = {72};
-        String mark = "final_1";
+        //{46,47}{52,53}{67,68}
+        String mark = "exam4";
 
         //初始化数据
         DBCommon.getInstance().setTargetDBName(mark);

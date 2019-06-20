@@ -6,6 +6,7 @@ import cn.nju.edu.software.Util.DirUtil;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -74,7 +75,7 @@ public class ZipDao {
             ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
             ZipEntry entry = null;
             while((entry=zis.getNextEntry())!=null){
-                if(entry.getName().equals("Dao\\log.db")) {
+                if(entry.getName().equals("Dao\\log.db")||entry.getName().equals("Dao\\log.db-shm")||entry.getName().equals("Dao\\log.db-wal")) {
                     File outFile = new File(descDir + entry.getName());
                     if (!outFile.getParentFile().exists()) {
                         outFile.getParentFile().mkdir();
@@ -83,7 +84,9 @@ public class ZipDao {
                         outFile.createNewFile();
                     }
                     BufferedInputStream bis = new BufferedInputStream(zf.getInputStream(entry));
-                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outFile));
+                    BufferedOutputStream bos = null;
+                    bos = new BufferedOutputStream(new FileOutputStream(outFile));
+
                     byte[] b = new byte[100];
                     while (true) {
                         int len = bis.read(b);
